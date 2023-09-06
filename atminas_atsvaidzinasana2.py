@@ -1,15 +1,28 @@
-import json
 import datetime
-
-x = datetime.datetime.now()
-print()
+import os
 
 def registracija():
-    vards_uzvards = input("Ievadi savu vārdu un uzvārdu:\n")
+    vards_uzvards = input("Ievadi savu vārdu un uzvārdu: ")
     return vards_uzvards
 
 vardsUNuzvards = registracija()
 rezultati = []
+
+def saving():
+    lastData = str(vardsUNuzvards)+" | Rezultāti: "+str(rezultati)+" | Datums: "+str(datetime.datetime.now())[:19]+"\n"
+    if os.path.isfile("lietotaji.txt"):
+        print("Fails Jau Eksistē!")
+        f = open("lietotaji.txt", "a")
+        f.write(lastData)
+        f.close()
+    else:
+        f = open("lietotaji.txt", "w")
+        f.write(lastData)
+        f.close()
+
+
+
+    return lastData
 
 def darbiba(action):
     a = int(input("Ievadi pirmo skaitli: "))
@@ -20,6 +33,7 @@ def darbiba(action):
         return a+b
     elif action == "2":
         print("Rezultāts:",a - b)
+        return a-b
     elif action == "3":
         print("Rezultāts:",a / b)
         return a/b
@@ -28,13 +42,11 @@ def darbiba(action):
         return a*b
     
 
-def saving():
-    lastData = vardsUNuzvards,"| Rezultāti",rezultati,"| Datums:",str(x)[:19]
 
 
 while True:
     # print("Rezultati list -", rezultati)
-    print('\nIzvelies darbibu: ')
+    print('Izvelies darbibu: ')
     print(' 1 - Saskaitīt \n 2 - Atņemt \n 3 - Dalīt \n 4 - Reizināt \n 5 - Iziet un Saglabāt')
     izvele = input(" ")
     if izvele == '1' or izvele == '2' or izvele == '3' or izvele == '4':
