@@ -12,11 +12,11 @@ def saving():
     lastData = str(vardsUNuzvards)+" | Rezultāti: "+str(rezultati)+" | Datums: "+str(datetime.datetime.now())[:19]+"\n"
     if os.path.isfile("lietotaji.txt"):
         print("Fails Jau Eksistē!")
-        f = open("lietotaji.txt", "a")
+        f = open("lietotaji.txt", "a",encoding="utf8")
         f.write(lastData)
         f.close()
     else:
-        f = open("lietotaji.txt", "w")
+        f = open("lietotaji.txt", "w",encoding="utf8")
         f.write(lastData)
         f.close()
 
