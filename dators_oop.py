@@ -1,5 +1,6 @@
 from tabulate import tabulate
 from tkinter import *
+import os
 
 class Sastavdalas():
     def __init__(self,Iesniegumi,Dators):
@@ -17,11 +18,11 @@ class Sastavdalas():
         self.show_frame(self.mainFrame)
         self.root.geometry("400x200")
 
-        ievadi=Button(self.mainFrame,text="ievadi",font=('Arial',15),command=lambda:window(1))
+        ievadi=Button(self.mainFrame,text="Ievadi",font=('Arial',15),command=lambda:window(1))
         ievadi.grid(row=1,column=0,pady=10)
 
 
-        edit=Button(self.mainFrame,text="rediģē",font=('Arial',15),command=lambda:window(2))
+        edit=Button(self.mainFrame,text="Rediģē / Saglabā",font=('Arial',15),command=lambda:window(2))
         edit.grid(row=2,column=0,pady=10)
 
         def window(windowNum):
@@ -35,7 +36,7 @@ class Sastavdalas():
                 self.show_frame(self.frame2)
                 self.Edit()
 
-        inspect=Button(self.mainFrame,text="apskati",font=('Arial',15),command=lambda:window(3))
+        inspect=Button(self.mainFrame,text="Apskati",font=('Arial',15),command=lambda:window(3))
         inspect.grid(row=3,column=0,pady=10)
 
         self.root.mainloop()
@@ -153,13 +154,29 @@ class Sastavdalas():
             iesniegt=Button(self.frame2,text="Iesniegt",font=('Arial Black',10),command=submit)
             iesniegt.grid(row=10,column=0,pady=5)
 
+        def saving(index):
+            sastavdala = self.dators[index]
+            if os.path.isfile("sastavdalas.txt"):
+                savingData2 = f"\n-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
+                f = open("sastavdalas.txt", "a",encoding="utf8")
+                f.write(savingData2)
+                f.close()
+            else:
+                savingData1 = f"-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
+                f = open("sastavdalas.txt", "w",encoding="utf8")
+                f.write(savingData1)
+                f.close()
+
         def generate_Values():
             for i,v in enumerate(self.dators):
                     output=Label(self.frame2,text=("Veids:",v[0],"Modelis:",v[1],"Cena:",v[2]),font="Arial,20")
                     outputBtn=Button(self.frame2,text="Rediģēt:",font=("Arial Black",12))
+                    saveBtn=Button(self.frame2,text="Saglabāt",font=("Arial Black",10))
                     outputBtn.configure(command=lambda button=outputBtn:editValue(button.grid_info()['row']))
+                    saveBtn.configure(command=lambda button=saveBtn:saving(button.grid_info()['row']))
                     output.grid(row=i,column=1,padx=5)
                     outputBtn.grid(row=i,column=0,padx=5)
+                    saveBtn.grid(row=i,column=2,padx=5)
 
             atpakal=Button(self.frame2,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame2))
             atpakal.grid(row=10,column=1,pady=5)
