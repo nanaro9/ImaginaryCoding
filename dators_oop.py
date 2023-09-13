@@ -2,6 +2,7 @@ from tabulate import tabulate
 from tkinter import *
 import os
 
+# Klases izveide ar grafiskās saskarnes īpašībām un vajadzīgajiem datiem tālākajām darbībām
 class Sastavdalas():
     def __init__(self,Iesniegumi,Dators):
         self.root = Tk()
@@ -14,6 +15,8 @@ class Sastavdalas():
         self.dators = Dators
         self.frames = [self.mainFrame,self.frame1,self.frame2,self.frame3]
     
+
+    # Sākuma metodes izveide, kurai jābūt izsauktai katru reizi, kad ir izveidots objekts
     def sakums(self):
         self.show_frame(self.mainFrame)
         self.root.geometry("400x200")
@@ -25,6 +28,7 @@ class Sastavdalas():
         edit=Button(self.mainFrame,text="Rediģē / Saglabā",font=('Arial',15),command=lambda:window(2))
         edit.grid(row=2,column=0,pady=10)
 
+        # Citu logu atvēršana pēc sekojošas pogas uzspiezšanas
         def window(windowNum):
             if windowNum == 1:
                 self.show_frame(self.frame1)
@@ -41,6 +45,7 @@ class Sastavdalas():
 
         self.root.mainloop()
 
+    # Metode logu/rāmju aizvēršanai un tad vajadzīga loga atvēršanai
     def show_frame(self,frame):
  
         for f in self.frames:
@@ -48,12 +53,14 @@ class Sastavdalas():
 
         frame.pack()
 
+    # Metode sākuma, jeb galvenā loga atvēršanai
     def back(self,frame):
         for f in frame.winfo_children():
             f.destroy()
         self.show_frame(self.mainFrame)
         self.sakums()
 
+    # Metode ievadīto datu apskatei
     def Apskate(self):
         self.show_frame(self.frame3)
         self.root.geometry("")
@@ -67,6 +74,7 @@ class Sastavdalas():
         atpakal.grid(row=2,column=1,pady=5)
         self.root.mainloop()
 
+    # Metode datu ievadīšanai
     def Ievade(self):
         self.show_frame(self.frame1) 
         self.root.geometry("")
@@ -86,11 +94,12 @@ class Sastavdalas():
         cena2=Entry(self.frame1,font=('Arial',15))
         cena2.grid(row=3,column=1)
 
-
+        # Datu iesniegšanas funkcija
         def Iesniegsana():
             self.iesniegumi += 1
             data = [veidi2.get().upper(),modelis2.get(),cena2.get()]
 
+            # Iesniegto datu pārbaudes funkcija
             def parbaude(data1,data2):
                 for i in data2:
                     if i == data1:
@@ -113,10 +122,12 @@ class Sastavdalas():
 
         self.root.mainloop()
 
+    # Metode datu rediģēšanai
     def Edit(self):
         self.show_frame(self.frame2)
         self.root.geometry("")
 
+        # Funkcija, kura attīra atmiņu, kura tika izmantota ar nevajadzīgiem papildu rīkiem (widgetiem - pogām, ievades laukiem)
         def editValue(index):
             for i in self.frame2.winfo_children():
                 i.destroy()
@@ -136,24 +147,30 @@ class Sastavdalas():
             cena2=Entry(self.frame2,font=('Arial',15))
             cena2.grid(row=index+3,column=1)
 
+            # Iesniegšanas funkcija, kurā tiek pārbaudīti dati, kuriem ir jābūt rediģētiem.
             def submit():
                 data = [veidi2.get().upper(),modelis2.get(),cena2.get()]
                 if data != ["","",""]:
+                    # Pārbaudes funkcija
                     def parbaude(data1,data2):
                         for i in data2:
                             if i == data1:
                                 return True
                     if not parbaude(data,self.dators):
+                        # Ja tādu datu nebija, ja jaunie dati ir jauni, tad tiek vecie dati tiek aizstāti.
                         self.dators[index] = data
 
                         frames = [veidi1,veidi2,modelis1,modelis2,cena1,cena2,iesniegt]
+                        # pēc visām mahinācijām visi logi attīras, lai neizmantotu lieki atmiņu (sava veida optimizācija)
                         for f in frames:
                             f.destroy()
+                        # Atkal izveidojas vajadzīgie rīki pēc rediģēšanas.
                         generate_Values()
 
             iesniegt=Button(self.frame2,text="Iesniegt",font=('Arial Black',10),command=submit)
             iesniegt.grid(row=10,column=0,pady=5)
 
+        # Funkcija, kura saglabā tieši tos datus, pie kuriem bija uzspiesta poga.
         def saving(index):
             sastavdala = self.dators[index]
             if os.path.isfile("sastavdalas.txt"):
@@ -167,6 +184,7 @@ class Sastavdalas():
                 f.write(savingData1)
                 f.close()
 
+        # Funkcija, izveido ievietoto datu rīkus. Katriem datiem savs rīks.
         def generate_Values():
             for i,v in enumerate(self.dators):
                     output=Label(self.frame2,text=("Veids:",v[0],"Modelis:",v[1],"Cena:",v[2]),font="Arial,20")
@@ -184,4 +202,5 @@ class Sastavdalas():
         generate_Values()
         self.root.mainloop()
 
+#Izveidojam objektu un izsaucam sākuma metodi.
 MyPc = Sastavdalas(0,[]).sakums()
