@@ -7,8 +7,8 @@ from datetime import *
 class Noma():
     def __init__(self):
         self.root = Tk()
+        self.root.title('Instrumentu un tehnikas uzskaites sistēma')
 
-        self.iesniegumi = 0
         self.produkti = []
         self.nomnieki = []
         self.Produkta_kategorija = ""
@@ -60,36 +60,98 @@ class Noma():
         cena = nomasCena*DienasKopa
         print("Nomas Cena Kopā:",cena)
         return cena
+    
+    
+    def Iesniegsana(self,data,IesniegumaVeids):
+
+        if IesniegumaVeids == "Produktu_Iesniegumi":
+            IesniegumaVeids = self.produkti
+        elif IesniegumaVeids == "Nomnieku_Iesniegumi":
+            IesniegumaVeids = self.nomnieki
+        # Iesniegto datu pārbaudes funkcija
+        def parbaude(data1,data2):
+            # 1. parbaude
+            for v in data1:
+                if v == "": return True
+            # 2. parbaude
+            for i in data2:
+                if i == data1:
+                    return True
+            
+        if parbaude(data,IesniegumaVeids):
+            print('iesniegsana neizdevas!')
+        elif not parbaude(data,IesniegumaVeids):
+            IesniegumaVeids.append(data)
+            print('iesniegts!')
 
     # Sākuma metodes izveide, kurai jābūt izsauktai katru reizi, kad ir izveidots objekts
+
+    def ShowFrame(self,izvele):
+        if izvele == "nomnieks":
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            self.IevadeNomnieks()
+        elif izvele == "produkts":
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            self.IevadeProdukts()
+        elif izvele == "Datu_Ievade":
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            self.DarbibasIzvele(izvele)
+        elif izvele == "Datu_Izvade":
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            self.DarbibasIzvele(izvele)
+        elif izvele == "nomnieks_Izvade":
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            self.Nomnieks_info()
+
     def sakums(self):
         if not self.Produkts_pieejams: return
-        self.show_frame(self.mainFrame)
-        self.root.geometry("400x200")
+        self.show_frame(self.frame1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
+        self.root.geometry("400x250")
 
-        ievadi=Button(self.mainFrame,text="Datu ievade",font=('Arial',15),command=lambda:window(1))
-        ievadi.grid(row=1,column=0,pady=10)
+        title = Label(self.frame1,text="Sveiki!\nIzvēlies Darbību:",font=('Arial Black',20))
+        title.grid(pady=10)
 
+        nomnieks=Button(self.frame1,text="Datu Ievade",font=('Arial',15),command= lambda:self.ShowFrame("Datu_Ievade"))
+        nomnieks.grid(pady=10)
 
-        edit=Button(self.mainFrame,text="Datu Izvade",font=('Arial',15),command=lambda:window(2))
-        edit.grid(row=2,column=0,pady=10)
-
-        # Citu logu atvēršana pēc sekojošas pogas uzspiezšanas
-        def window(windowNum):
-            if windowNum == 1:
-                self.show_frame(self.frame1)
-                self.Ievade()
-            if windowNum == 3:
-                self.show_frame(self.frame3)
-                self.Apskate()
-            if windowNum == 2:
-                self.show_frame(self.frame2)
-                self.Edit()
-
-        inspect=Button(self.mainFrame,text="Datu Printēšana",font=('Arial',15),command=lambda:window(3))
-        inspect.grid(row=3,column=0,pady=10)
+        if self.produkti != [] and self.produkti != []:
+            nomnieks=Button(self.frame1,text="Datu Izvade",font=('Arial',15),command= lambda:self.ShowFrame("Datu_Izvade"))
+            nomnieks.grid(pady=10)
 
         self.root.mainloop()
+
+    def DarbibasIzvele(self,darbiba):
+        self.show_frame(self.frame1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
+        self.root.geometry("400x300")
+
+        title = Label(self.frame1,text="Sveiki!\nIzvēlies Darbību:",font=('Arial Black',20))
+        title.grid(pady=10)
+
+        if darbiba == "Datu_Ievade":
+            nomnieks=Button(self.frame1,text="Ievadīt Nomnieku",font=('Arial',15),command= lambda:self.ShowFrame("nomnieks"))
+            nomnieks.grid(pady=10)
+
+            produkts=Button(self.frame1,text="Ievadīt Produktu",font=('Arial',15),command= lambda:self.ShowFrame("produkts"))
+            produkts.grid(pady=10,padx = 10)
+        elif darbiba == "Datu_Izvade":
+            nomnieks=Button(self.frame1,text="Izvadīt Nomnieku",font=('Arial',15),command= lambda:self.ShowFrame("nomnieks_Izvade"))
+            nomnieks.grid(pady=10)
+
+            produkts=Button(self.frame1,text="Izvadīt Produktu",font=('Arial',15),command= lambda:self.ShowFrame("produkts"))
+            produkts.grid(pady=10,padx = 10)
+            
+        atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame1))
+        atpakal.grid(pady=5)
+
 
     # Metode logu/rāmju aizvēršanai un tad vajadzīga loga atvēršanai
     def show_frame(self,frame):
@@ -107,40 +169,92 @@ class Noma():
         self.sakums()
 
     # Metode ievadīto datu apskatei
-    def Apskate(self):
-        self.show_frame(self.frame3)
+
+    def Nomnieks_info(self):
+        self.show_frame(self.frame1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
         self.root.geometry("")
-        # outputFrame=LabelFrame(self.frame3,text='Tabula')
-        # outputFrame.grid(row=1,column=1)
 
-        # output=Label(outputFrame,text=(tabulate(self.dators, headers=['Veids', 'Modelis', 'Cena'])),font="Arial,20")
-        # output.pack()
+        def generate_Nomnieks_info(index):
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            index = int(index)
+            nomnieks = self.nomnieki[index]
+            NomnieksLabel = Label(self.frame1,text=(f"Nomnieka Vārds/Uzvārds: {nomnieks[0]} {nomnieks[1]}\nNomnieka Personas Kods: {nomnieks[2]}\nNomnieka Telefona Numurs: {nomnieks[3]}\nNomas Sākuma Datums: {nomnieks[4]}\nNomas Beigu Datums: {nomnieks[5]}"),font=('Arial',15))
+            NomnieksLabel.grid(row=0,padx=10,pady=10)
 
-        # atpakal=Button(self.frame3,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame3))
-        # atpakal.grid(row=2,column=1,pady=5)
+            atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: generate_Nomnieki())
+            atpakal.grid(row=1,column=1,pady=5)
+            print=Button(self.frame1,text="Izprintēt Datus",font=('Arial Black',10))
+            print.grid(row=1,column=0,pady=5)
+
+        def generate_Nomnieki():
+            for f in self.frame1.winfo_children():
+                f.destroy()
+
+            title = Label(self.frame1,text="Izvēlies Interesējošo Nomnieku:",font=('Arial Black',20))
+            title.grid(row=0, pady=10)
+            for i,nomnieks in enumerate(self.nomnieki):
+                i = i + 1
+                NomnieksButton = Button(self.frame1,text=(f"{str(i)}.",nomnieks[0],nomnieks[1]),font=('Arial',15),command=lambda:generate_Nomnieks_info(int(NomnieksButton.cget("text")[0:1])-1))
+                NomnieksButton.grid(row=i,padx=10,pady=10)
+            atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame1))
+            atpakal.grid(pady=5)
+
+        generate_Nomnieki()
+
+        self.root.mainloop()
+
+    def Produkts_info(self):
+        self.show_frame(self.frame1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
+        self.root.geometry("")
+
+        def generate_Produkts_info(index):
+            for f in self.frame1.winfo_children():
+                f.destroy()
+            index = int(index)
+            produkts = self.produkti[index]
+            ProduktsLabel = Label(self.frame1,text=(f"Nomnieka Vārds/Uzvārds: {nomnieks[0]} {nomnieks[1]}\nNomnieka Personas Kods: {nomnieks[2]}\nNomnieka Telefona Numurs: {nomnieks[3]}\nNomas Sākuma Datums: {nomnieks[4]}\nNomas Beigu Datums: {nomnieks[5]}"),font=('Arial',15))
+            ProduktsLabel.grid(padx=10,pady=10)
+
+            atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: generate_Produkti())
+            atpakal.grid(pady=5)
+
+        def generate_Produkti():
+            for f in self.frame1.winfo_children():
+                f.destroy()
+
+            title = Label(self.frame1,text="Izvēlies Interesējošo Produktu:",font=('Arial Black',20))
+            title.grid(row=0, pady=10)
+            for i,nomnieks in enumerate(self.nomnieki):
+                NomnieksButton = Button(self.frame1,text=(f"{str(i)}.",nomnieks[0],nomnieks[1]),font=('Arial',15),command=lambda:generate_Produkts_info(NomnieksButton.cget("text")[0:1]))
+                i = i + 1
+                NomnieksButton.grid(row=i,padx=10,pady=10)
+            atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame1))
+            atpakal.grid(pady=5)
+
+        generate_Produkti()
+
         self.root.mainloop()
 
 
-    def Ievade(self):
-        self.show_frame(self.frame1) 
-        self.root.geometry("400x100")
 
-        def ShowNomnieksIevade(izvele):
-            if izvele == "nomnieks":
-                for f in self.frame1.winfo_children():
-                    f.destroy()
-                self.IevadeNomnieks()
-            elif izvele == "produkts":
-                for f in self.frame1.winfo_children():
-                    f.destroy()
-                self.IevadeProdukts()
+    def Apskate(self):
+        self.show_frame(self.frame3)
+        self.root.geometry("")
 
-        nomnieks=Button(self.frame1,text="Ievadīt Nomnieku",font=('Arial',15),command= lambda:ShowNomnieksIevade("nomnieks"))
-        nomnieks.grid(row=1,column=0,pady=10)
+        nomnieks=Button(self.frame1,text="Apskatīt Informāciju Par Nomnieku",font=('Arial',15))
+        nomnieks.grid(pady=10)
 
-        produkts=Button(self.frame1,text="Ievadīt Produktu",font=('Arial',15),command= lambda:ShowNomnieksIevade("produkts"))
-        produkts.grid(row=1,column=1,pady=10,padx = 10)
+        produkts=Button(self.frame1,text="Apskatīt Informāciju Par Produktu",font=('Arial',15))
+        produkts.grid(pady=10,padx = 10)
 
+        atpakal=Button(self.frame3,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame3))
+        atpakal.grid(row=100,column=1,pady=5)
+        self.root.mainloop()
 
     # Metode datu ievadīšanai
     def IevadeProdukts(self):
@@ -167,26 +281,7 @@ class Noma():
         cena2=Entry(self.frame1,font=('Arial',15))
         cena2.grid(row=4,column=1)
 
-        def Iesniegsana():
-            self.iesniegumi += 1
-            data = [kategorija2.get(),nosaukums2.get(),raksturojums2.get(),cena2.get()]
-
-            # Iesniegto datu pārbaudes funkcija
-            def parbaude(data1,data2):
-                for i in data2:
-                    if i == data1:
-                        return True
-                    
-            if self.iesniegumi <= 1:
-                self.produkti.append(data)
-                print('iesniegts!')
-            elif self.iesniegumi > 1 and not parbaude(data,self.produkti):
-                print('iesniegumu vairak par 1, Iesniegumi atskiras, iesniegts!')
-                self.produkti.append(data)
-            elif self.iesniegumi > 1 and parbaude(data,self.produkti):
-                print('iesniegsana neizdevas!')
-
-        iesniegt=Button(self.frame1,text="Iesniegt",font=('Arial Black',10))
+        iesniegt=Button(self.frame1,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([kategorija2.get(),nosaukums2.get(),raksturojums2.get(),cena2.get()],"Produktu_Iesniegumi"))
         iesniegt.grid(row=100,column=0,pady=5)
 
         atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame1))
@@ -228,29 +323,7 @@ class Noma():
         NomaBeigas2=Entry(self.frame1,font=('Arial',15))
         NomaBeigas2.grid(row=7,column=1)
 
-
-
-        # Datu iesniegšanas funkcija
-        def Iesniegsana():
-            self.iesniegumi += 1
-            data = [vards2.get().upper(),uzvards2.get(),personasKods2.get(),telefonaNumurs2.get(),NomaSakums2.get(),NomaBeigas2.get()]
-
-            # Iesniegto datu pārbaudes funkcija
-            def parbaude(data1,data2):
-                for i in data2:
-                    if i == data1:
-                        return True
-                    
-            if self.iesniegumi <= 1:
-                self.nomnieki.append(data)
-                print('iesniegts!')
-            elif self.iesniegumi > 1 and not parbaude(data,self.nomnieki):
-                print('iesniegumu vairak par 1, Iesniegumi atskiras, iesniegts!')
-                self.nomnieki.append(data)
-            elif self.iesniegumi > 1 and parbaude(data,self.nomnieki):
-                print('iesniegsana neizdevas!')
-            
-        iesniegt=Button(self.frame1,text="Iesniegt",font=('Arial Black',10),command=Iesniegsana)
+        iesniegt=Button(self.frame1,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([vards2.get(),uzvards2.get(),personasKods2.get(),telefonaNumurs2.get(),NomaSakums2.get(),NomaBeigas2.get()],"Nomnieku_Iesniegumi"))
         iesniegt.grid(row=100,column=0,pady=5)
 
         atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame1))
@@ -258,34 +331,19 @@ class Noma():
 
         self.root.mainloop()
 
-    # Funkcija, kura saglabā tieši tos datus, pie kuriem bija uzspiesta poga.
-    # def saving(index):
-    #     sastavdala = self.dators[index]
-    #     if os.path.isfile("sastavdalas.txt"):
-    #         savingData2 = f"\n-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
-    #         f = open("sastavdalas.txt", "a",encoding="utf8")
-    #         f.write(savingData2)
-    #         f.close()
-    #     else:
-    #         savingData1 = f"-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
-    #         f = open("sastavdalas.txt", "w",encoding="utf8")
-    #         f.write(savingData1)
-    #         f.close()
 
-    # Funkcija, izveido ievietoto datu rīkus. Katriem datiem savs rīks.
-    # def generate_Values():
-    #     for i,v in enumerate(self.dators):
-    #             output=Label(self.frame2,text=("Veids:",v[0],"Modelis:",v[1],"Cena:",v[2]),font="Arial,20")
-    #             outputBtn=Button(self.frame2,text="Rediģēt:",font=("Arial Black",12))
-    #             saveBtn=Button(self.frame2,text="Saglabāt",font=("Arial Black",10))
-    #             outputBtn.configure(command=lambda button=outputBtn:editValue(button.grid_info()['row']))
-    #             saveBtn.configure(command=lambda button=saveBtn:saving(button.grid_info()['row']))
-    #             output.grid(row=i,column=1,padx=5)
-    #             outputBtn.grid(row=i,column=0,padx=5)
-    #             saveBtn.grid(row=i,column=2,padx=5)
-
-    #     atpakal=Button(self.frame2,text="Atpakal",font=('Arial Black',10),command=lambda: self.back(self.frame2))
-    #     atpakal.grid(row=10,column=1,pady=5)
+    def saving(self):
+        sastavdala = ""
+        if os.path.isfile("Nomnieki.txt"):
+            savingData2 = f"\n-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
+            f = open("sastavdalas.txt", "a",encoding="utf8")
+            f.write(savingData2)
+            f.close()
+        else:
+            savingData1 = f"-Personālā datora sastāvdaļa-\nVeids: {sastavdala[0]}\nModelis: {sastavdala[1]}\nCena: {sastavdala[2]} EUR\n"
+            f = open("sastavdalas.txt", "w",encoding="utf8")
+            f.write(savingData1)
+            f.close()
 
 #Izveidojam objektu un izsaucam sākuma metodi.
 
