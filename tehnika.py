@@ -217,7 +217,7 @@ class Noma():
                 f.destroy()
             index = int(index)
             produkts = self.produkti[index]
-            ProduktsLabel = Label(self.frame1,text=(f"Nomnieka Vārds/Uzvārds: {nomnieks[0]} {nomnieks[1]}\nNomnieka Personas Kods: {nomnieks[2]}\nNomnieka Telefona Numurs: {nomnieks[3]}\nNomas Sākuma Datums: {nomnieks[4]}\nNomas Beigu Datums: {nomnieks[5]}"),font=('Arial',15))
+            ProduktsLabel = Label(self.frame1,text=(f"Produkta nosaukums: {produkts[0]} {produkts[1]}\nProdukta kategorija: {produkts[2]}\nProdukta raksturojums: {produkts[3]}\nNomas cena dienā: {produkts[4]}"),font=('Arial',15))
             ProduktsLabel.grid(padx=10,pady=10)
 
             atpakal=Button(self.frame1,text="Atpakal",font=('Arial Black',10),command=lambda: generate_Produkti())
