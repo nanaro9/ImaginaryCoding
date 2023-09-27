@@ -1,0 +1,11 @@
+    -Pirkuma Čeks-
+Pircēja Vārds/Uzvārds: Artjoms Tutins
+Pircēja Personas Kods: 123456-78901
+Pircēja Tālruņa Numurs: 26543218
+ 
+Antibiotiku Nosaukums: pretsāpju antibiotikas
+Antibiotiku Kategorija: Ibumetin
+Antibiotiku raksturojums: 400g / 10 tabletes
+Antibiotiku Cena: 6 EUR
+ 
+    Paldies Par Pirkumu!

@@ -223,8 +223,8 @@ class Aptieka():
 
             for i,antibiotikas in enumerate(self.antibiotikas):
                 i = i + 1
-                antibiotikasButton = Button(self.frame,text=(f"{str(i)}.",antibiotikas[0],antibiotikas[1]),font=('Arial',15),command=lambda:generate_Antibiotikas_info(antibiotikasButton.cget("text")[0:1]))
-                antibiotikasButton.grid(row=i-1,padx=10,pady=10)
+                antibiotikasButton = Button(self.frame,text=(f"{str(i)}.",antibiotikas[0],antibiotikas[1]),font=('Arial',15),command=lambda:generate_Antibiotikas_info(int(antibiotikasButton.cget("text")[0:1])-1))
+                antibiotikasButton.grid(row=i,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
             atpakal.grid(row=100,pady=5)
@@ -260,8 +260,8 @@ class Aptieka():
 
             for i,pircejs in enumerate(self.pirceji):
                 i = i + 1
-                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:generate_Pircejs_info(pircejsButton.cget("text")[0:1]))
-                pircejsButton.grid(row=i-1,padx=10,pady=10)
+                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:generate_Pircejs_info(int(pircejsButton.cget("text")[0:1])-1))
+                pircejsButton.grid(row=i,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
             atpakal.grid(row=100,pady=5)
