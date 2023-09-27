@@ -1,6 +1,7 @@
 # Tēma - Aptiekas uzskaites sistēma
 # Programmas izstrādātājs - Aleksis Počs
 
+import os
 from tkinter import *
 
 class Aptieka():
@@ -35,7 +36,14 @@ class Aptieka():
             self.frame.pack()
             return
         
-        self.DarbibasIzvele(izvele[0])
+        if izvele[0] == "antibiotikas_izvade":
+            self.Antibiotikas_info()
+        elif izvele[0] == "pircejs_izvade":
+            self.Pircejs_info()
+        elif izvele[0] == "printesana":
+            self.pirkums_info_print()
+        else:
+            self.DarbibasIzvele(izvele[0])
         self.frame.pack()
 
 
@@ -43,7 +51,7 @@ class Aptieka():
         self.LoguMaina()
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)   
-        self.root.geometry("500x250")
+        self.root.geometry("500x325")
 
         title = Label(self.frame,text="Sveicināti Aptiekas Sistēmā!\nIzvēlies Darbību:",font=('Arial Black',20))
         title.grid(pady=10)
@@ -51,14 +59,20 @@ class Aptieka():
         datu_Ievade=Button(self.frame,text="Datu Ievade",font=('Arial',15),command=lambda: self.LoguMaina("ievade"))
         datu_Ievade.grid(pady=10)
 
-        datu_Izvade=Button(self.frame,text="Datu Izvade",font=('Arial',15),command=lambda:izvadesParbaude())
+        datu_Izvade=Button(self.frame,text="Datu Izvade",font=('Arial',15),command=lambda:izvadesParbaude(datu_Izvade))
         datu_Izvade.grid(pady=10)
 
-        def izvadesParbaude():
+        datu_Printesana=Button(self.frame,text="Datu Printēšana",font=('Arial',15),command=lambda:izvadesParbaude(datu_Printesana))
+        datu_Printesana.grid(pady=10)
+
+        def izvadesParbaude(widget):
             if self.pirceji != [] and self.antibiotikas != []:
-                self.LoguMaina("izvade")
+                if widget.cget("text") == "Datu Izvade": 
+                    self.LoguMaina("izvade")
+                elif widget.cget("text") == "Datu Printēšana":
+                    self.LoguMaina("printesana")
             else:
-                datu_Izvade.configure(text="Nav Pircēju un Antibiotiku Datu!")
+                widget.configure(text="Nav Pircēju un Antibiotiku Datu!")
 
 
         self.root.mainloop()
@@ -184,11 +198,108 @@ class Aptieka():
 
 
     def Antibiotikas_info(self):
-        pass
+        self.LoguMaina()
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
+        self.root.geometry("")
+
+        def generate_Antibiotikas_info(index):
+            for f in self.frame.winfo_children():
+                f.destroy()
+            index = int(index)
+            antibiotika = self.antibiotikas[index]
+            ProduktsLabel = Label(self.frame,text=(f"Antibiotiku nosaukums: {antibiotika[0]}\nAntibiotiku kategorija: {antibiotika[1]}\nAntibiotiku raksturojums: {antibiotika[2]}\nAntibiotiku Cena: {antibiotika[3]} EUR"),font=('Arial',15))
+            ProduktsLabel.grid(padx=10,pady=10)
+
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal.grid(row=100,pady=5)
+
+        def generate_Antibiotikas():
+            for f in self.frame.winfo_children():
+                f.destroy()
+
+            title = Label(self.frame,text="Izvēlies Interesējošās Antibiotikas:",font=('Arial Black',20))
+            title.grid(row=0, pady=10)
+
+            for i,antibiotikas in enumerate(self.antibiotikas):
+                i = i + 1
+                antibiotikasButton = Button(self.frame,text=(f"{str(i)}.",antibiotikas[0],antibiotikas[1]),font=('Arial',15),command=lambda:generate_Antibiotikas_info(antibiotikasButton.cget("text")[0:1]))
+                antibiotikasButton.grid(row=i-1,padx=10,pady=10)
+
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal.grid(row=100,pady=5)
+
+        generate_Antibiotikas()
+
+
 
     
     def Pircejs_info(self):
-        pass
-    
+        self.LoguMaina()
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)   
+        self.root.geometry("")
+
+        def generate_Pircejs_info(index):
+            for f in self.frame.winfo_children():
+                f.destroy()
+            index = int(index)
+            pircejs = self.pirceji[index]
+            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}"),font=('Arial',15))
+            pircejsLabel.grid(padx=10,pady=10)
+            
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal.grid(row=100,pady=5)
+
+        def generate_Pircejs():
+            for f in self.frame.winfo_children():
+                f.destroy()
+
+            title = Label(self.frame,text="Izvēlies Interesējošo Pircēju:",font=('Arial Black',20))
+            title.grid(row=0, pady=10)
+
+            for i,pircejs in enumerate(self.pirceji):
+                i = i + 1
+                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:generate_Pircejs_info(pircejsButton.cget("text")[0:1]))
+                pircejsButton.grid(row=i-1,padx=10,pady=10)
+
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal.grid(row=100,pady=5)
+
+        generate_Pircejs()
+
+    def pirkums_info_print(self):
+        def generate_Pircejs():
+            for f in self.frame.winfo_children():
+                f.destroy()
+
+            title = Label(self.frame,text="Izvēlies Interesējošo Pircēju:",font=('Arial Black',20))
+            title.grid(row=0, pady=10)
+
+            for i,pircejs in enumerate(self.pirceji):
+                i = i + 1
+                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:print(int(pircejsButton.cget("text")[0:1])-1))
+                pircejsButton.grid(row=i,padx=10,pady=10)
+
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal.grid(row=100,pady=5)
+
+        generate_Pircejs()
+
+        def print(index):
+            index = int(index)
+            pircejs = self.pirceji[index]
+            antibiotikas = self.antibiotikas[index]
+            if os.path.isfile("pirkumi.txt"):
+                savingData2 = f"    -Pirkuma Čeks-\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n \nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n \n    Paldies Par Pirkumu!\n"
+                f = open("pirkumi.txt", "a",encoding="utf8")
+                f.write(savingData2)
+                f.close()
+            else:
+                savingData1 = f"    -Pirkuma Čeks-\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n \nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n \n    Paldies Par Pirkumu!\n"
+                f = open("pirkumi.txt", "w",encoding="utf8")
+                f.write(savingData1)
+                f.close()
+        
 
 SystemAptieka = Aptieka().Main()
