@@ -59,7 +59,7 @@ class Aptieka():
                 self.LoguMaina("izvade")
             else:
                 datu_Izvade.configure(text="Nav Pircēju un Antibiotiku Datu!")
-                
+
 
         self.root.mainloop()
 
@@ -182,6 +182,13 @@ class Aptieka():
             IesniegumaVeids.append(data)
             print('iesniegts!')
 
+
+    def Antibiotikas_info(self):
+        pass
+
+    
+    def Pircejs_info(self):
+        pass
     
 
 SystemAptieka = Aptieka().Main()
