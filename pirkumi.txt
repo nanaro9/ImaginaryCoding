@@ -1,4 +1,5 @@
-    -Pirkuma Čeks-
+-Pirkuma Čeks-
+
 Pircēja Vārds/Uzvārds: Artjoms Tutins
 Pircēja Personas Kods: 123456-78901
 Pircēja Tālruņa Numurs: 26543218
@@ -8,4 +9,17 @@ Antibiotiku Kategorija: Ibumetin
 Antibiotiku raksturojums: 400g / 10 tabletes
 Antibiotiku Cena: 6 EUR
  
-    Paldies Par Pirkumu!
+Paldies Par Pirkumu!
+
+-Pirkuma Čeks-
+
+Pircēja Vārds/Uzvārds: Artjoms Tutins
+Pircēja Personas Kods: 123456-78901
+Pircēja Tālruņa Numurs: 24232221
+
+Antibiotiku Nosaukums: pretsāpju
+Antibiotiku Kategorija: Paracetamols
+Antibiotiku raksturojums: 400g / 5 tabletes
+Antibiotiku Cena: 3.99 EUR
+
+Paldies Par Pirkumu!
