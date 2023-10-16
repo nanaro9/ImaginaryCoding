@@ -3,6 +3,7 @@
 
 import os
 from tkinter import *
+import mysql.connector
 
 class Aptieka():
     # Konstruktora izveide
@@ -302,4 +303,8 @@ class Aptieka():
                 f.close()
         
 
-SystemAptieka = Aptieka().Main()
+# SystemAptieka = Aptieka().Main()
+
+db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="p5kartot")
+print(db)
+db.close()
