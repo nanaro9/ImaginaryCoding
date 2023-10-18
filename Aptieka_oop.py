@@ -307,4 +307,17 @@ class Aptieka():
 
 db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="p5kartot")
 print(db)
+
+#metode .cursor()
+
+cursor = db.cursor()
+
+sql = ("""
+insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
+values (%s, %s, %s, %s,%s);
+       """)
+
+data = (1,"Andris","Berzins","123456-78901","24242424")
+cursor.execute(sql,data)
+db.commit()
 db.close()
