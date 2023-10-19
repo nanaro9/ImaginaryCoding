@@ -25,8 +25,12 @@ class Aptieka():
 
         self.frame = Frame(self.root)
 
-        self.antibiotikas = []
-        self.pirceji = []
+        self.cursor.execute("SELECT * FROM antibiotikas_info")
+        self.antibiotikas = self.cursor.fetchall()
+        self.cursor.execute("SELECT * FROM pircejs_info")
+        self.pirceji = self.cursor.fetchall()
+
+        # print(self.antibiotikas,self.pirceji)
 
     def LoguMaina(self,*izvele):
         # Neizmantojamo logrīku iznīcināšana labākai veiktspējai
@@ -69,6 +73,7 @@ class Aptieka():
         datu_Printesana.grid(pady=10)
 
         def izvadesParbaude(widget):
+            # print(self.pirceji)
             if self.pirceji != [] and self.antibiotikas != []:
                 if widget.cget("text") == "Datu Izvade": 
                     self.LoguMaina("izvade")
@@ -170,7 +175,7 @@ class Aptieka():
             cena2=Entry(frame,font=('Arial',15))
             cena2.grid(row=4,column=1)
 
-            iesniegt=Button(frame,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([kategorija2.get(),nosaukums2.get(),raksturojums2.get(),cena2.get()],"antibiotikas_iesniegt"))
+            iesniegt=Button(frame,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([kategorija2.get(),nosaukums2.get(),raksturojums2.get(),int(cena2.get())],"antibiotikas_iesniegt"))
             iesniegt.grid(row=100,column=0,pady=5)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=self.back)
@@ -180,23 +185,45 @@ class Aptieka():
     def Iesniegsana(self,data,IesniegumaVeids):
         if IesniegumaVeids == "antibiotikas_iesniegt":
             IesniegumaVeids = self.antibiotikas
+            sql = ("""
+                insert into antibiotikas_info (antibiotikas_ID, antibiotikas_kategorija, antibiotikas_nosaukums, antibiotikas_raksturojums, antibiotikas_cena)
+                values (%s, %s, %s, %s,%s);
+                """)
+            self.cursor.execute("SELECT * FROM antibiotikas_info")
         elif IesniegumaVeids == "pircejs_iesniegt":
             IesniegumaVeids = self.pirceji
+            sql = ("""
+                insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
+                values (%s, %s, %s, %s,%s);
+                """)
+            self.cursor.execute("SELECT * FROM pircejs_info")
 
         # Iesniegto datu pārbaudes funkcija
-        def parbaude(data1,data2):
+        def parbaude(data1):
             # 1. parbaude
             for v in data1:
                 if v == "": return True
             # 2. parbaude
-            for i in data2:
-                if i == data1:
+            for i in self.cursor.fetchall():
+                if list(i[1:]) == data1:
                     return True
             
-        if parbaude(data,IesniegumaVeids):
+        if parbaude(data):
             print('iesniegsana neizdevas!')
-        elif not parbaude(data,IesniegumaVeids):
+        elif not parbaude(data):
             IesniegumaVeids.append(data)
+            if IesniegumaVeids == self.pirceji:
+                self.cursor.execute("SELECT * FROM pircejs_info")
+            elif IesniegumaVeids == self.antibiotikas:
+                self.cursor.execute("SELECT * FROM antibiotikas_info")
+            idx = self.cursor.fetchall()[-1][0]
+            if idx != NONE or idx > 0:
+                idx += 1 
+            elif idx == NONE:
+                idx = 0
+            data.insert(0,idx)
+            self.cursor.execute(sql,data)
+            self.db.commit()
             print('iesniegts!')
 
 
@@ -211,7 +238,7 @@ class Aptieka():
                 f.destroy()
             index = int(index)
             antibiotika = self.antibiotikas[index]
-            ProduktsLabel = Label(self.frame,text=(f"Antibiotiku nosaukums: {antibiotika[0]}\nAntibiotiku kategorija: {antibiotika[1]}\nAntibiotiku raksturojums: {antibiotika[2]}\nAntibiotiku Cena: {antibiotika[3]} EUR"),font=('Arial',15))
+            ProduktsLabel = Label(self.frame,text=(f"Antibiotiku nosaukums: {antibiotika[1]}\nAntibiotiku kategorija: {antibiotika[2]}\nAntibiotiku raksturojums: {antibiotika[3]}\nAntibiotiku Cena: {antibiotika[4]} EUR"),font=('Arial',15))
             ProduktsLabel.grid(padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
@@ -224,10 +251,10 @@ class Aptieka():
             title = Label(self.frame,text="Izvēlies Interesējošās Antibiotikas:",font=('Arial Black',20))
             title.grid(row=0, pady=10)
 
-            for i,antibiotikas in enumerate(self.antibiotikas):
-                i = i + 1
-                antibiotikasButton = Button(self.frame,text=(f"{str(i)}.",antibiotikas[0],antibiotikas[1]),font=('Arial',15),command=lambda:generate_Antibiotikas_info(int(antibiotikasButton.cget("text")[0:1])-1))
-                antibiotikasButton.grid(row=i,padx=10,pady=10)
+            self.cursor.execute("SELECT * FROM antibiotikas_info")
+            for antibiotikas in self.cursor.fetchall():
+                antibiotikasButton = Button(self.frame,text=(f"{antibiotikas[0]+1}.",antibiotikas[2]),font=('Arial',15),command=lambda id=antibiotikas[0]:generate_Antibiotikas_info(id))
+                antibiotikasButton.grid(row=(antibiotikas[0])+1,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
             atpakal.grid(row=100,pady=5)
@@ -246,9 +273,10 @@ class Aptieka():
         def generate_Pircejs_info(index):
             for f in self.frame.winfo_children():
                 f.destroy()
-            index = int(index)
-            pircejs = self.pirceji[index]
-            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}"),font=('Arial',15))
+            self.cursor.execute("SELECT * FROM pircejs_info")
+            pircejs = self.cursor.fetchall()[index]
+            # print(pircejs,index)
+            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {pircejs[3]}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
             pircejsLabel.grid(padx=10,pady=10)
             
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
@@ -261,10 +289,10 @@ class Aptieka():
             title = Label(self.frame,text="Izvēlies Interesējošo Pircēju:",font=('Arial Black',20))
             title.grid(row=0, pady=10)
 
-            for i,pircejs in enumerate(self.pirceji):
-                i = i + 1
-                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:generate_Pircejs_info(int(pircejsButton.cget("text")[0:1])-1))
-                pircejsButton.grid(row=i,padx=10,pady=10)
+            self.cursor.execute("SELECT * FROM pircejs_info")
+            for pirceji in self.cursor.fetchall():
+                pircejsButton = Button(self.frame,text=(f"{str(pirceji[0])}.",pirceji[1],pirceji[2]),font=('Arial',15),command=lambda id=pirceji[0]:generate_Pircejs_info(id))
+                pircejsButton.grid(row=(pirceji[0])+1,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
             atpakal.grid(row=100,pady=5)
@@ -279,31 +307,26 @@ class Aptieka():
             title = Label(self.frame,text="Izvēlies Interesējošo Pircēju:",font=('Arial Black',20))
             title.grid(row=0, pady=10)
 
-            for i,pircejs in enumerate(self.pirceji):
-                i = i + 1
-                pircejsButton = Button(self.frame,text=(f"{str(i)}.",pircejs[0],pircejs[1]),font=('Arial',15),command=lambda:print(int(pircejsButton.cget("text")[0:1])-1))
-                pircejsButton.grid(row=i,padx=10,pady=10)
+            self.cursor.execute("SELECT * FROM pircejs_info")
+            for pirceji in self.cursor.fetchall():
+                pircejsButton = Button(self.frame,text=(f"{str(pirceji[0])}.",pirceji[1],pirceji[2]),font=('Arial',15),command=lambda id=pirceji[0]:pirkums(id))
+                pircejsButton.grid(row=(pirceji[0])+1,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
             atpakal.grid(row=100,pady=5)
 
         generate_Pircejs()
 
-        def print(index):
-            index = int(index)
-            pircejs = self.pirceji[index]
-            antibiotikas = self.antibiotikas[index]
-            sqlPircejs = ("""
-            insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
-            values (%s, %s, %s, %s,%s);
-                """)
-            self.cursor.execute("SELECT * FROM pircejs_info")
-            for column in self.cursor:
-                index = int(column[0])
-            index += 1
-            pircejs.insert(0,index)
-            self.cursor.execute(sqlPircejs,pircejs)
-            self.db.commit()
+        def pirkums(index):
+            pass
+            # pircejs = self.pirceji[index]
+            # sqlPircejs = ("""
+            # insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
+            # values (%s, %s, %s, %s,%s);
+            #     """)
+            # pircejs.insert(0,index)
+            # self.cursor.execute(sqlPircejs,pircejs)
+            # self.db.commit()
             
             # if os.path.isfile("pirkumi.txt"):
             #     savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
