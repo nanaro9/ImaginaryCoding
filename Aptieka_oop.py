@@ -16,7 +16,7 @@ class Aptieka():
         self.Pirceja_uzvārds = ""
         self.Priceja_pk = ""
         self.Pirceja_mobilais = ""
-        self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="p5kartot")
+        self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="login")
         self.cursor = self.db.cursor()
 
         # Grafiskai saskarnei nepieciešamās funkcijas, metodes, dati
