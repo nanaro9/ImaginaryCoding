@@ -16,6 +16,8 @@ class Aptieka():
         self.Pirceja_uzvārds = ""
         self.Priceja_pk = ""
         self.Pirceja_mobilais = ""
+        self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="p5kartot")
+        self.cursor = self.db.cursor()
 
         # Grafiskai saskarnei nepieciešamās funkcijas, metodes, dati
         self.root = Tk()
@@ -291,33 +293,28 @@ class Aptieka():
             index = int(index)
             pircejs = self.pirceji[index]
             antibiotikas = self.antibiotikas[index]
-            if os.path.isfile("pirkumi.txt"):
-                savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-                f = open("pirkumi.txt", "a",encoding="utf8")
-                f.write(savingData2)
-                f.close()
-            else:
-                savingData1 = f"-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-                f = open("pirkumi.txt", "w",encoding="utf8")
-                f.write(savingData1)
-                f.close()
+            sqlPircejs = ("""
+            insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
+            values (%s, %s, %s, %s,%s);
+                """)
+            self.cursor.execute("SELECT * FROM pircejs_info")
+            for column in self.cursor:
+                index = int(column[0])
+            index += 1
+            pircejs.insert(0,index)
+            self.cursor.execute(sqlPircejs,pircejs)
+            self.db.commit()
+            
+            # if os.path.isfile("pirkumi.txt"):
+            #     savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
+            #     f = open("pirkumi.txt", "a",encoding="utf8")
+            #     f.write(savingData2)
+            #     f.close()
+            # else:
+            #     savingData1 = f"-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
+            #     f = open("pirkumi.txt", "w",encoding="utf8")
+            #     f.write(savingData1)
+            #     f.close()
         
 
-# SystemAptieka = Aptieka().Main()
-
-db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="p5kartot")
-print(db)
-
-#metode .cursor()
-
-cursor = db.cursor()
-
-sql = ("""
-insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
-values (%s, %s, %s, %s,%s);
-       """)
-
-data = (1,"Andris","Berzins","123456-78901","24242424")
-cursor.execute(sql,data)
-db.commit()
-db.close()
+SystemAptieka = Aptieka().Main()
