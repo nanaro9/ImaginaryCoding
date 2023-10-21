@@ -4,6 +4,7 @@
 import os
 from tkinter import *
 import mysql.connector
+import datetime
 
 class Aptieka():
     # Konstruktora izveide
@@ -48,7 +49,7 @@ class Aptieka():
         elif izvele[0] == "pircejs_izvade":
             self.Pircejs_info()
         elif izvele[0] == "printesana":
-            self.pirkums_info_print()
+            self.pirkums_pircejs()
         else:
             self.DarbibasIzvele(izvele[0])
         self.frame.pack()
@@ -145,7 +146,7 @@ class Aptieka():
             iesniegt=Button(frame,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([vards2.get(),uzvards2.get(),personas_kods2.get(),mobilais2.get()],"pircejs_iesniegt"))
             iesniegt.grid(row=100,column=0,pady=5)
 
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=self.back)
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda:self.DarbibasIzvele("ievade"))
             atpakal.grid(row=100,column=1,pady=5)
 
         elif darbiba == "antibiotikas":
@@ -175,10 +176,19 @@ class Aptieka():
             cena2=Entry(frame,font=('Arial',15))
             cena2.grid(row=4,column=1)
 
-            iesniegt=Button(frame,text="Iesniegt",font=('Arial Black',10),command=lambda:self.Iesniegsana([kategorija2.get(),nosaukums2.get(),raksturojums2.get(),int(cena2.get())],"antibiotikas_iesniegt"))
+            def cenaValueReplacement():
+                cenaValue = ""
+                if "," in cena2.get():
+                    cenaValue = cena2.get().replace(",",".")
+                else:
+                    cenaValue = cena2.get()
+
+                self.Iesniegsana([kategorija2.get(),nosaukums2.get(),raksturojums2.get(),float(cenaValue)],"antibiotikas_iesniegt")
+
+            iesniegt=Button(frame,text="Iesniegt",font=('Arial Black',10),command=lambda:cenaValueReplacement())
             iesniegt.grid(row=100,column=0,pady=5)
 
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=self.back)
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda:self.DarbibasIzvele("ievade"))
             atpakal.grid(row=100,column=1,pady=5)
 
 
@@ -241,7 +251,7 @@ class Aptieka():
             ProduktsLabel = Label(self.frame,text=(f"Antibiotiku nosaukums: {antibiotika[1]}\nAntibiotiku kategorija: {antibiotika[2]}\nAntibiotiku raksturojums: {antibiotika[3]}\nAntibiotiku Cena: {antibiotika[4]} EUR"),font=('Arial',15))
             ProduktsLabel.grid(padx=10,pady=10)
 
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.Antibiotikas_info())
             atpakal.grid(row=100,pady=5)
 
         def generate_Antibiotikas():
@@ -256,7 +266,7 @@ class Aptieka():
                 antibiotikasButton = Button(self.frame,text=(f"{antibiotikas[0]+1}.",antibiotikas[2]),font=('Arial',15),command=lambda id=antibiotikas[0]:generate_Antibiotikas_info(id))
                 antibiotikasButton.grid(row=(antibiotikas[0])+1,padx=10,pady=10)
 
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.DarbibasIzvele("izvade"))
             atpakal.grid(row=100,pady=5)
 
         generate_Antibiotikas()
@@ -279,7 +289,7 @@ class Aptieka():
             pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {pircejs[3]}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
             pircejsLabel.grid(padx=10,pady=10)
             
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.Pircejs_info())
             atpakal.grid(row=100,pady=5)
 
         def generate_Pircejs():
@@ -294,12 +304,12 @@ class Aptieka():
                 pircejsButton = Button(self.frame,text=(f"{str(pirceji[0])}.",pirceji[1],pirceji[2]),font=('Arial',15),command=lambda id=pirceji[0]:generate_Pircejs_info(id))
                 pircejsButton.grid(row=(pirceji[0])+1,padx=10,pady=10)
 
-            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+            atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.DarbibasIzvele("izvade"))
             atpakal.grid(row=100,pady=5)
 
         generate_Pircejs()
 
-    def pirkums_info_print(self):
+    def pirkums_pircejs(self):
         def generate_Pircejs():
             for f in self.frame.winfo_children():
                 f.destroy()
@@ -309,7 +319,7 @@ class Aptieka():
 
             self.cursor.execute("SELECT * FROM pircejs_info")
             for pirceji in self.cursor.fetchall():
-                pircejsButton = Button(self.frame,text=(f"{str(pirceji[0])}.",pirceji[1],pirceji[2]),font=('Arial',15),command=lambda id=pirceji[0]:pirkums(id))
+                pircejsButton = Button(self.frame,text=(f"{str(pirceji[0])}.",pirceji[1],pirceji[2]),font=('Arial',15),command=lambda id=pirceji[0]:self.pirkums_antibiotikas(id))
                 pircejsButton.grid(row=(pirceji[0])+1,padx=10,pady=10)
 
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
@@ -317,27 +327,68 @@ class Aptieka():
 
         generate_Pircejs()
 
-        def pirkums(index):
-            pass
-            # pircejs = self.pirceji[index]
-            # sqlPircejs = ("""
-            # insert into pircejs_info (pircejs_ID, pircejs_vards, pircejs_uzvards, pircejs_pk, pircejs_mobilais)
-            # values (%s, %s, %s, %s,%s);
-            #     """)
-            # pircejs.insert(0,index)
-            # self.cursor.execute(sqlPircejs,pircejs)
-            # self.db.commit()
-            
-            # if os.path.isfile("pirkumi.txt"):
-            #     savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-            #     f = open("pirkumi.txt", "a",encoding="utf8")
-            #     f.write(savingData2)
-            #     f.close()
-            # else:
-            #     savingData1 = f"-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-            #     f = open("pirkumi.txt", "w",encoding="utf8")
-            #     f.write(savingData1)
-            #     f.close()
+    def pirkums_antibiotikas(self,indexPircejs):
+        self.root.geometry("")
+        for f in self.frame.winfo_children():
+            f.destroy()
+
+        title = Label(self.frame,text="Izvēlies Antibiotikas, Kuras Tika Iegādātas:",font=('Arial Black',20))
+        title.grid(row=0, pady=10)
+
+        self.cursor.execute("SELECT * FROM antibiotikas_info")
+        for antibiotikas in self.cursor.fetchall():
+            pircejsButton = Button(self.frame,text=(f"{str(antibiotikas[0])}.",antibiotikas[2]),font=('Arial',15),command=lambda id=antibiotikas[0]:self.pirkums(indexPircejs,id))
+            pircejsButton.grid(row=(antibiotikas[0])+1,padx=10,pady=10)
+
+        atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.pirkums_pircejs())
+        atpakal.grid(row=100,pady=5)
+
+
+
+    def pirkums(self,indexPircejs,indexAntibiotikas):
+        self.root.geometry("700x150")
+        for f in self.frame.winfo_children():
+            f.destroy()
+
+        pircejs = self.pirceji[indexPircejs]
+        antibiotikas = self.antibiotikas[indexAntibiotikas]
+        datums = str(datetime.datetime.now())[:-7]
+
+        sql = ("""
+        insert into pirkums_info (pirkums_ID, pircejs_ID, antibiotikas_ID, pirkums_Datums)
+        values (%s, %s, %s, %s);
+            """)
+        
+        data = [indexPircejs,indexAntibiotikas,datums]
+        self.cursor.execute("SELECT * FROM pirkums_info")
+        indexPirkums = self.cursor.fetchall()
+        if indexPirkums == NONE or indexPirkums == []:
+            indexPirkums = 0
+        else:
+            if indexPirkums[-1][0] > 0 or indexPirkums [-1][0] != NONE:
+                indexPirkums = indexPirkums[-1][0]
+                indexPirkums += 1
+
+        data.insert(0,indexPirkums)
+        self.cursor.execute(sql,data)
+        self.db.commit()
+
+        title = Label(self.frame,text="Pirkums Tika Veiksmīgi Ierakstīts Datubāzē!",font=('Arial Black',20))
+        title.grid(row=0, pady=10)
+
+        atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
+        atpakal.grid(row=100,pady=5)
+
+        # if os.path.isfile("pirkumi.txt"):
+        #     savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
+        #     f = open("pirkumi.txt", "a",encoding="utf8")
+        #     f.write(savingData2)
+        #     f.close()
+        # else:
+        #     savingData1 = f"-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
+        #     f = open("pirkumi.txt", "w",encoding="utf8")
+        #     f.write(savingData1)
+        #     f.close()
         
 
 SystemAptieka = Aptieka().Main()
