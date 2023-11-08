@@ -5,6 +5,7 @@ import os
 from tkinter import *
 import mysql.connector
 import datetime
+from cryptography.fernet import Fernet
 
 class Aptieka():
     # Konstruktora izveide
@@ -19,6 +20,11 @@ class Aptieka():
         self.Pirceja_mobilais = ""
         self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="password")
         self.cursor = self.db.cursor()
+
+        self.atslega = Fernet.generate_key()
+        self.objekts = Fernet(self.atslega)
+
+        print(self.atslega)
 
         # Grafiskai saskarnei nepieciešamās funkcijas, metodes, dati
         self.root = Tk()
@@ -231,6 +237,15 @@ class Aptieka():
                 idx += 1 
             elif idx == NONE:
                 idx = 0
+
+            def cryptDati(datuTabula,indekss):
+                teksts = str(datuTabula[indekss])
+                bTeksts = bytes(teksts,'UTF-8')
+                kriptDati = self.objekts.encrypt(bTeksts)
+                datuTabula[indekss] = kriptDati
+
+            cryptDati(data,2)
+            cryptDati(data,3)
             data.insert(0,idx)
             self.cursor.execute(sql,data)
             self.db.commit()
@@ -286,7 +301,7 @@ class Aptieka():
             self.cursor.execute("SELECT * FROM pircejs_info")
             pircejs = self.cursor.fetchall()[index]
             # print(pircejs,index)
-            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {pircejs[3]}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
+            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {self.objekts.decrypt(pircejs[3])}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
             pircejsLabel.grid(padx=10,pady=10)
             
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.Pircejs_info())
@@ -378,17 +393,6 @@ class Aptieka():
 
         atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.back())
         atpakal.grid(row=100,pady=5)
-
-        # if os.path.isfile("pirkumi.txt"):
-        #     savingData2 = f"\n-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-        #     f = open("pirkumi.txt", "a",encoding="utf8")
-        #     f.write(savingData2)
-        #     f.close()
-        # else:
-        #     savingData1 = f"-Pirkuma Čeks-\n\nPircēja Vārds/Uzvārds: {pircejs[0]} {pircejs[1]}\nPircēja Personas Kods: {pircejs[2]}\nPircēja Tālruņa Numurs: {pircejs[3]}\n\nAntibiotiku Nosaukums: {antibiotikas[0]}\nAntibiotiku Kategorija: {antibiotikas[1]}\nAntibiotiku raksturojums: {antibiotikas[2]}\nAntibiotiku Cena: {antibiotikas[3]} EUR\n\nPaldies Par Pirkumu!"
-        #     f = open("pirkumi.txt", "w",encoding="utf8")
-        #     f.write(savingData1)
-        #     f.close()
         
 
 SystemAptieka = Aptieka().Main()
