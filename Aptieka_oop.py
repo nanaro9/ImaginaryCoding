@@ -5,7 +5,10 @@ import os
 from tkinter import *
 import mysql.connector
 import datetime
+import base64
 from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 class Aptieka():
     # Konstruktora izveide
@@ -21,10 +24,8 @@ class Aptieka():
         self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="password")
         self.cursor = self.db.cursor()
 
-        self.atslega = Fernet.generate_key()
+        self.atslega = b'IeIXGVbK5fzVXI7N6n2g6heIg8Vtmby2uCZ8wneC3XY='
         self.objekts = Fernet(self.atslega)
-
-        print(self.atslega)
 
         # Grafiskai saskarnei nepieciešamās funkcijas, metodes, dati
         self.root = Tk()
@@ -223,7 +224,7 @@ class Aptieka():
             for i in self.cursor.fetchall():
                 if list(i[1:]) == data1:
                     return True
-            
+                
         if parbaude(data):
             print('iesniegsana neizdevas!')
         elif not parbaude(data):
@@ -232,10 +233,16 @@ class Aptieka():
                 self.cursor.execute("SELECT * FROM pircejs_info")
             elif IesniegumaVeids == self.antibiotikas:
                 self.cursor.execute("SELECT * FROM antibiotikas_info")
-            idx = self.cursor.fetchall()[-1][0]
+            idx = self.cursor.fetchall()
+            if idx == []:
+                idx = 0
+            else:
+                idx = int(idx[-1][0])
+
+
             if idx != NONE or idx > 0:
                 idx += 1 
-            elif idx == NONE:
+            elif idx == NONE or idx == []:
                 idx = 0
 
             def cryptDati(datuTabula,indekss):
@@ -244,8 +251,8 @@ class Aptieka():
                 kriptDati = self.objekts.encrypt(bTeksts)
                 datuTabula[indekss] = kriptDati
 
-            cryptDati(data,2)
-            cryptDati(data,3)
+            # cryptDati(data,2)
+            # cryptDati(data,3)
             data.insert(0,idx)
             self.cursor.execute(sql,data)
             self.db.commit()
@@ -301,7 +308,7 @@ class Aptieka():
             self.cursor.execute("SELECT * FROM pircejs_info")
             pircejs = self.cursor.fetchall()[index]
             # print(pircejs,index)
-            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {self.objekts.decrypt(pircejs[3])}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
+            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {pircejs[3]}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
             pircejsLabel.grid(padx=10,pady=10)
             
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.Pircejs_info())
