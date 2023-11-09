@@ -7,8 +7,6 @@ import mysql.connector
 import datetime
 import base64
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 class Aptieka():
     # Konstruktora izveide
@@ -24,7 +22,8 @@ class Aptieka():
         self.db = mysql.connector.connect(host="localhost",database="aptieka",user="root",password="password")
         self.cursor = self.db.cursor()
 
-        self.atslega = b'IeIXGVbK5fzVXI7N6n2g6heIg8Vtmby2uCZ8wneC3XY='
+        self.atslega = b'PpPPPPpAaaaAAAaSsssssssWwwWwwwwwwOOooooRRDD='
+        # Backup_Atlsega  =  b'IeIXGVbK5fzVXI7N6n2g6heIg8Vtmby2uCZ8wneC3XY='
         self.objekts = Fernet(self.atslega)
 
         # Grafiskai saskarnei nepieciešamās funkcijas, metodes, dati
@@ -250,9 +249,11 @@ class Aptieka():
                 bTeksts = bytes(teksts,'UTF-8')
                 kriptDati = self.objekts.encrypt(bTeksts)
                 datuTabula[indekss] = kriptDati
+            
+            if IesniegumaVeids == self.pirceji:
+                cryptDati(data,2)
+                cryptDati(data,3)
 
-            # cryptDati(data,2)
-            # cryptDati(data,3)
             data.insert(0,idx)
             self.cursor.execute(sql,data)
             self.db.commit()
@@ -306,9 +307,13 @@ class Aptieka():
             for f in self.frame.winfo_children():
                 f.destroy()
             self.cursor.execute("SELECT * FROM pircejs_info")
-            pircejs = self.cursor.fetchall()[index]
+            pirceji = self.cursor.fetchall()
+            if len(pirceji) <= 1:
+                pircejs = pirceji[0]
+            else:
+                pircejs = pirceji[index-1]
             # print(pircejs,index)
-            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {pircejs[3]}\nPircēja Tālruņa Numurs: {pircejs[4]}"),font=('Arial',15))
+            pircejsLabel = Label(self.frame,text=(f"Pircēja Vārds/Uzvārds: {pircejs[1]} {pircejs[2]}\nPircēja Personas Kods: {self.objekts.decrypt(pircejs[3]).decode()}\nPircēja Tālruņa Numurs: {self.objekts.decrypt(pircejs[4]).decode()}"),font=('Arial',15))
             pircejsLabel.grid(padx=10,pady=10)
             
             atpakal=Button(self.frame,text="Atpakal",font=('Arial Black',10),command=lambda: self.Pircejs_info())
