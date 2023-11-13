@@ -1,7 +1,23 @@
-{
-    "Laiks America/New_York": "08:35",
-    "Laiks Europe/Riga": "15:35",
-    "Laika_Zona America/New_York": "-05",
-    "Laiks_Zona Europe/Riga": "+02",
-    "Laika_Starpiba ('America/New_York', 'Europe/Riga')": "7 h"
-}
+[
+    {
+        "Laiks America/New_York": "09:42",
+        "Laiks Europe/Riga": "16:42",
+        "Laika_Zona America/New_York": "-05",
+        "Laika_Zona Europe/Riga": "+02",
+        "Laika_Starpiba ('America/New_York', 'Europe/Riga')": "7 h"
+    },
+    {
+        "Laiks America/New_York": "09:43",
+        "Laiks Europe/Berlin": "15:43",
+        "Laika_Zona America/New_York": "-05",
+        "Laika_Zona Europe/Berlin": "+01",
+        "Laika_Starpiba ('America/New_York', 'Europe/Berlin')": "6 h"
+    },
+    {
+        "Laiks Europe/Riga": "16:43",
+        "Laiks Asia/Tokyo": "23:43",
+        "Laika_Zona Europe/Riga": "+02",
+        "Laika_Zona Asia/Tokyo": "+09",
+        "Laika_Starpiba ('Europe/Riga', 'Asia/Tokyo')": "7 h"
+    }
+]
