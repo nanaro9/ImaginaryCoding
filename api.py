@@ -1,12 +1,3 @@
-# 1. Izveidots vienkāršs servera puses pieprasījums.
-# 2. Izveidota tukša atbilde no servera.
-# 3. Atbilde no servera ir izveidots kā tukšs JSON objekts tā formātā.
-# 4. Atbilde no servera tiek izveidota JSON formātā, iekļaujot reāllaika izdruku.
-# 5. Tiek iestrādāti laika zonas starpības parametri pieprasījumā.
-# 6. Serveris atbild ar kļūdu, izmantojot dažādas datu struktūras kļūdas definēšanā, ja līdzi
-# nav padoti laika zonas starpības parametri.
-# 7. Serveris atbild ar izmainītu laika un datuma izdruku atbilstoši iedotajai stundu nobīdei.
-
 #Autors - Aleksis Pocs
 # Programma - Laika konvertacija
 
@@ -15,7 +6,7 @@ import requests
 import json
 import os
 response1 = requests.get("http://worldtimeapi.org/api/timezone/Europe/Riga")
-response2 = requests.get("http://worldtimeapi.org/api/timezone/Asia/Tokyo")
+response2 = requests.get("http://worldtimeapi.org/api/timezone/Australia/Sydney")
 
 def getLocation(obj):
     location = obj.json()["timezone"]

@@ -19,5 +19,19 @@
         "Laika_Zona Europe/Riga": "+02",
         "Laika_Zona Asia/Tokyo": "+09",
         "Laika_Starpiba ('Europe/Riga', 'Asia/Tokyo')": "7 h"
+    },
+    {
+        "Laiks Europe/Riga": "14:15",
+        "Laiks Australia/Sydney": "23:15",
+        "Laika_Zona Europe/Riga": "+02",
+        "Laika_Zona Australia/Sydney": "+11",
+        "Laika_Starpiba ('Europe/Riga', 'Australia/Sydney')": "9 h"
+    },
+    {
+        "Laiks Europe/Riga": "14:34",
+        "Laiks Australia/Sydney": "23:34",
+        "Laika_Zona Europe/Riga": "+02",
+        "Laika_Zona Australia/Sydney": "+11",
+        "Laika_Starpiba ('Europe/Riga', 'Australia/Sydney')": "9 h"
     }
 ]
