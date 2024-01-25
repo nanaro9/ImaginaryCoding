@@ -2,6 +2,7 @@
 # Izstrādāta 5. tēmas ietvaros
 
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
+import customtkinter
 
 class Alganators(): # Definē klasi Alganators
     def __init__(self,darbinieks_alga,darbinieks_berni,darbinieks_vards,darbinieks_uzvards,darbinieks_pk,uznemums,darba_devejs_vards,darba_devejs_uzvards): # Klases sākuma uzstādīšana
@@ -39,12 +40,20 @@ class Alganators(): # Definē klasi Alganators
         if self.darbinieks_alga <= self.ALGAS_LIKME: # Pārbauda, vai bruto alga nav lielāka par algas likmi, kura ir 1667 eiro
             sn = self.darbinieks_alga * self.SN_LIKME # 1. darbība ir sociālā nodokļa aprēķins (bruto alga pareizināta ar sociālā nodokļa likmi (10.5%))
             iin_baze = self.darbinieks_alga - sn - atvieglojums # 2. IIN (iedzīvotāja ienākuma nodokļa) bāzes aprēķināšana (no bruto algas tiek atņemts sociālais nodoklis un atvieglojums)
+            if iin_baze > 0:
+                pass
+            else:
+                iin_baze = 0
             iin = iin_baze * self.IIN_LIKME # 3. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, IIN bāze tiek pareizināta ar IIN likmi, kura ir 20%
             neto_alga = self.darbinieks_alga - sn - iin # 4. Neto algas (tīrās algas) aprēķināšana, no bruto algas tiek atņemti visi nodokļi (sociālais nodoklis un iedzīvotāja ienākuma nodoklis)
             return neto_alga # Atgriež neto algas vērtību
         else: # Ja bruto alga ir lielāka par algas likmi, kura ir 1667 eiro, tad:
             sn = self.darbinieks_alga * self.SN_LIKME # 1. sociālā nodokļa aprēķināšana (bruto alga pareizināta ar sociālā nodokļa likmi (10.5%))
             iin_baze = self.ALGAS_LIKME - sn - atvieglojums # 2. IIN (iedzīvotāja ienākuma nodokļa) bāzes aprēķināšana (no algas likmes (1667 eiro) tiek atņemts sociālais nodoklis un atvieglojums)
+            if iin_baze > 0:
+                pass
+            else:
+                iin_baze = 0
             iin = iin_baze * self.IIN_LIKME # 3. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, IIN bāze tiek pareizināta ar IIN likmi, kura ir 20%
             parpalikums = self.darbinieks_alga - self.ALGAS_LIKME # 4. Pārpalikuma aprēķināšana, kuru var izrēķināt, atņemot algas likmi (1667) no bruto algas
             iin2 = parpalikums * self.IIN_LIKME2 # 5. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, šoreiz pareizinot pārpalikumu ar IIN likmi, kad bruto alga pārsniedz 1667 eiro, tas ir 23%
@@ -97,6 +106,61 @@ class Alganators(): # Definē klasi Alganators
                 self.db.commit()
                 count += 1
 
-stradnieks = Alganators(1000,1,"Guntars","Tutins","040400-0404","SIA PLEĶĪŠI","Aleksandrs","Sātīgais") # Objekta izveide
-print(stradnieks.algas_formula()) # metodes izvade
+stradnieks = Alganators(2000,0,"Guntars","Tutins","040400-0404","SIA PLEĶĪŠI","Aleksandrs","Sātīgais") # Objekta izveide
+# print(stradnieks.algas_formula()) # metodes izvade
 # stradnieks.saglabasana("db")
+
+def mainApp():
+    customtkinter.set_appearance_mode("System")
+    customtkinter.set_default_color_theme("blue")
+
+    root = customtkinter.CTk()
+    root.geometry("500x350")
+    root.title("Algas aprēķina programma")
+    root.resizable(False,False)
+
+    def loginFrame():   
+        def login():
+            Input_credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()}
+            if Input_credentials["Login_Input"] != "Admin" and Input_credentials["Password_Input"] != "Password":
+                frame = customtkinter.CTkToplevel(master=loginframe)
+                frame.geometry("1000x200")
+                frame.resizable(False,False)
+                frame.title("Uzmanību!")
+
+                errorMSG = customtkinter.CTkLabel(master=frame, text=("Uzmanību! Lietotājvārds vai parole tika ievadīta nepareizi!"), font=("Roboto",32), anchor="center")
+                errorMSG.pack(padx=50, pady=50)
+            else:
+                loginframe.destroy()
+        def guest():
+            loginframe.destroy()
+        loginframe = customtkinter.CTkFrame(master=root)
+        loginframe.pack(pady=20, padx=60, fill="both", expand=True)
+
+        label = customtkinter.CTkLabel(master=loginframe, text="Sveicināti, Lietotāj!", font=("Roboto",22))
+        label.pack(pady=12,padx=10)
+
+        loginEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Lietotājvārds")
+        loginEntry.pack(pady=12,padx=10)
+
+        passwordEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Parole", show="*")
+        passwordEntry.pack(pady=12,padx=10)
+
+        loginbutton = customtkinter.CTkButton(master=loginframe, text="Pieslēgties", command=login)
+        loginbutton.pack(pady=12,padx=10)
+
+        guestButton = customtkinter.CTkButton(master=loginframe, text="Viesa režīms", command=guest)
+        guestButton.pack(pady=12,padx=10)
+        
+        
+
+
+    def guest():
+        pass
+
+    loginFrame()
+
+    root.mainloop()
+
+
+mainApp()
