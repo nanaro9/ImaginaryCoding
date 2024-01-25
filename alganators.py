@@ -22,16 +22,17 @@ class Alganators(): # Definē klasi Alganators
         self.darba_devejs_uzvards = darba_devejs_uzvards # Vienkārši definē tukšu mainīgo
         self.uznemums = uznemums # Vienkārši definē tukšu mainīgo
 
-        self.data = {"Darbinieks": {"Vards":darbinieks_vards,"Uzvards":darbinieks_uzvards,"Personas_kods":darbinieks_pk,"Berni":darbinieks_berni,"Alga":darbinieks_alga},"Darba_Devejs":{"Vards":darba_devejs_vards,"Uzvards":darba_devejs_uzvards},"Uznemums":uznemums} # vārdnīcas izveide, kurā tiks glabāti ievadītie dati
+        self.data = {"Darbinieks": {"Vards":darbinieks_vards,"Uzvards":darbinieks_uzvards,"Personas_kods":darbinieks_pk,"Berni":darbinieks_berni,"Alga":darbinieks_alga},"darba_Devejs":{"Vards":darba_devejs_vards,"Uzvards":darba_devejs_uzvards},"Uznemums":uznemums} # vārdnīcas izveide, kurā tiks glabāti ievadītie dati
 
         self.db = mysql.connector.connect(host="localhost",database="algaprekins",user="root",password="password") # Programma tiek savienota ar datu bāzi, kuras nosaukums ir "algaprekins"
         self.cursor = self.db.cursor() # Kursora definēšana, ar kura palīdzību var pārvietoties pa datu bāzi
 
-        self.cursor.execute("SELECT * FROM darbinieks") # izvēlas visus datus no tabulas "darbinieks"
-        self.darbinieki = self.cursor.fetchall() # Saņem augstāk izvēlētos datus un pielīdzina tos mainīgajam "darbinieki"
-
-        self.cursor.execute("SELECT * FROM darba_devejs") # izvēlas visus datus no tabulas "darba_devejs"
-        self.darba_deveji = self.cursor.fetchall() # Saņem augstāk izvēlētos datus un pielīdzina tos mainīgajam "darba_deveji"
+        self.veids = ["darbinieks","darba_devejs","alga"]
+        self.db_dati = {"darbinieks":[],"darba_deveji":[],"alga":[]}
+        
+        for v in self.veids:
+            self.cursor.execute(f"SELECT * FROM {v}")
+            self.db_dati[v] = self.cursor.fetchall()
 
     def algas_formula(self): # Definēta funkcija, kura saņems 2 datus, bruto algu un bērnu skaitu
         atvieglojums = self.darbinieks_berni * self.APGADAJAMO_LIKME # atvieglojuma aprēķināšana (bērnu skaits pareizināts ar likmi, kura ir 250 eiro par vienu bērnu)
@@ -51,46 +52,51 @@ class Alganators(): # Definē klasi Alganators
             return neto_alga # Atgriež neto algas vērtību
     
     def index_parbaude(self,idx):
-        if idx == []:
+        if idx == None or idx == []:
             idx = 0
-        else:
-            idx = int(idx[-1][0])
-
-        if idx != None and idx > 0:
-            idx += 1 
-        elif idx == None and idx == []:
-            idx = 0
+        elif idx != None:
+            idx = int(idx[-1][0]) + 1
         return idx
+    
+    def pieskir_index(self,struktura,indeksi):
+        for i in struktura:
+            i.insert(0,indeksi[struktura.index(i)])
+            if i == struktura[2]:
+                i.insert(3,indeksi[0])
+                i.insert(4,indeksi[1])
+        return struktura
 
         
     def saglabasana(self,veids):
         if veids == "txt":
             pass
         elif veids == "db":
-            sql_alga = ("""
-                    insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);
-                """)
-            sql_darbinieks = ("""
-                    insert into darbinieks (ID_darbinieks, darbinieks_vards, darbinieks_uzvards, darbinieks_pk, darbinieks_berni, darbinieks_alga) values (%s, %s, %s, %s,%s, %s);
-                """)
-            sql_darba_devejs = ("""
-                    insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s, %s);
-                """)
+
+            sql = {
+                "Darbinieks":("""insert into darbinieks (ID_darbinieks, darbinieks_vards, darbinieks_uzvards, darbinieks_pk, darbinieks_berni, darbinieks_alga) values (%s, %s, %s, %s,%s, %s);"""),
+                "Darba Devejs":("""insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s,%s, %s);"""),
+                "Alga":("""insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);""")
+                }
             
-            self.cursor.execute("SELECT * FROM alga")
-            idx = self.cursor.fetchall()
-            print(self.index_parbaude(idx))
             alga_data_structure = [self.data["Uznemums"],self.algas_formula()]
-            
-            # self.data["alga"].insert(0,idx)
-            # self.cursor.execute(sql,data)
-            # self.db.commit()
-            # print('iesniegts!')
-        
-        
+            darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]]
+            darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]]
 
+            indeksi = []
 
-    
-stradnieks = Alganators(900,2,"Jaroslavs","Belovs","010100-0101","SIA KLUCĪŠI","Pēteris","Lielais") # Objekta izveide
+            for v in self.veids:
+                self.cursor.execute(f"SELECT * FROM {v}")
+                indeksi.append(self.index_parbaude(self.cursor.fetchall()))
+
+            structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
+            structures = self.pieskir_index(structures,indeksi)
+
+            count = 0
+            for i in sql:
+                self.cursor.execute(sql[i],structures[count])
+                self.db.commit()
+                count += 1
+
+stradnieks = Alganators(1000,1,"Guntars","Tutins","040400-0404","SIA PLEĶĪŠI","Aleksandrs","Sātīgais") # Objekta izveide
 print(stradnieks.algas_formula()) # metodes izvade
-stradnieks.saglabasana("db")
+# stradnieks.saglabasana("db")
