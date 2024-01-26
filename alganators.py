@@ -72,14 +72,12 @@ class Alganators(): # Definē klasi Alganators
             idx = int(idx[-1][0]) + 1
         return idx
     
-    def pieskir_index(self,struktura,indeksi,sakritibas=None):
+    def pieskir_index(self,struktura,indeksi):
         for i in struktura:
             i.insert(0,indeksi[struktura.index(i)])
             if i == struktura[2]:
                 i.insert(3,indeksi[0])
                 i.insert(4,indeksi[1])
-        if sakritibas:
-            print(sakritibas,struktura)
         return struktura
     
     def datu_parbaude(self,data):
@@ -101,7 +99,6 @@ class Alganators(): # Definē klasi Alganators
                             if i.index(j) == 1:
                                 if j == data[count][i.index(j)]:
                                     sakritosie_dati["alga"][1]+=1
-                # print(self.db_dati[v],data[count])
             else:
                 print("empty data")
             count+=1
@@ -109,14 +106,17 @@ class Alganators(): # Definē klasi Alganators
             if i == "darba_devejs":
                 if sakritosie_dati[i][1] == 2:
                     sakritosie_dati[i][0] = True
+                    return sakritosie_dati[i][0]
             elif i == "darbinieks":
                 if sakritosie_dati[i][1] == 3:
                     sakritosie_dati[i][0] = True
+                    return sakritosie_dati[i][0]
             else:
                 if sakritosie_dati[i][1] == 1:
                     sakritosie_dati[i][0] = True
-        
-        return sakritosie_dati
+                    return sakritosie_dati[i][0]
+            
+        return False
 
 
 
@@ -145,25 +145,17 @@ class Alganators(): # Definē klasi Alganators
             structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
             structures = self.pieskir_index(structures,indeksi)
             parbaude = self.datu_parbaude(structures)
-            structures = self.pieskir_index(structures,indeksi,parbaude)
-            # print(structures)
-
-            keys=[]
-            for key in sql.keys():
-                keys.append(key)
-
             count=0
-            for v in parbaude:
-                if not parbaude[v][0]:
-                    pass
-                else:
-                    sql.pop(keys[count])
-                count += 1
-            count = 0
-            for i in sql:
-                count += 1
+            if not parbaude:
+                count = 0
+                for i in sql:
+                    self.cursor.execute(sql[i],structures[count])
+                    self.db.commit()
+                    count += 1
+            else:
+                print("Dati nav unique")
 
-stradnieks = Alganators(2000,0,"Guntars","Tutins","040400-0404","SIA PEĻĶĪTE","Aleksandrs","Sātīgais") # Objekta izveide
+stradnieks = Alganators(2000,0,"Guntaars","Tutens","050400-0404","SIA PEĻĶĪTE","Apeksandrs","Sūtīgais") # Objekta izveide
 print(stradnieks.algas_formula()) # metodes izvade
 stradnieks.saglabasana("db")
 
