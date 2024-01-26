@@ -3,6 +3,8 @@
 
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
 import customtkinter
+import base64
+from cryptography.fernet import Fernet
 
 class Alganators(): # Definē klasi Alganators
     def __init__(self,darbinieks_alga,darbinieks_berni,darbinieks_vards,darbinieks_uzvards,darbinieks_pk,uznemums,darba_devejs_vards,darba_devejs_uzvards): # Klases sākuma uzstādīšana
@@ -23,13 +25,16 @@ class Alganators(): # Definē klasi Alganators
         self.darba_devejs_uzvards = darba_devejs_uzvards # Vienkārši definē tukšu mainīgo
         self.uznemums = uznemums # Vienkārši definē tukšu mainīgo
 
+        self.atslega = b'PpPPPPpAaaaAAAaSsssssssWwwWwwwwwwOOooooRRDD='
+        self.objekts = Fernet(self.atslega)
+
         self.data = {"Darbinieks": {"Vards":darbinieks_vards,"Uzvards":darbinieks_uzvards,"Personas_kods":darbinieks_pk,"Berni":darbinieks_berni,"Alga":darbinieks_alga},"darba_Devejs":{"Vards":darba_devejs_vards,"Uzvards":darba_devejs_uzvards},"Uznemums":uznemums} # vārdnīcas izveide, kurā tiks glabāti ievadītie dati
 
         self.db = mysql.connector.connect(host="localhost",database="algaprekins",user="root",password="password") # Programma tiek savienota ar datu bāzi, kuras nosaukums ir "algaprekins"
         self.cursor = self.db.cursor() # Kursora definēšana, ar kura palīdzību var pārvietoties pa datu bāzi
 
         self.veids = ["darbinieks","darba_devejs","alga"]
-        self.db_dati = {"darbinieks":[],"darba_deveji":[],"alga":[]}
+        self.db_dati = {"darbinieks":[],"darba_devejs":[],"alga":[]}
         
         for v in self.veids:
             self.cursor.execute(f"SELECT * FROM {v}")
@@ -67,13 +72,53 @@ class Alganators(): # Definē klasi Alganators
             idx = int(idx[-1][0]) + 1
         return idx
     
-    def pieskir_index(self,struktura,indeksi):
+    def pieskir_index(self,struktura,indeksi,sakritibas=None):
         for i in struktura:
             i.insert(0,indeksi[struktura.index(i)])
             if i == struktura[2]:
                 i.insert(3,indeksi[0])
                 i.insert(4,indeksi[1])
+        if sakritibas:
+            print(sakritibas,struktura)
         return struktura
+    
+    def datu_parbaude(self,data):
+        count = 0
+        sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
+        for v in self.db_dati:
+            if self.db_dati[v] != []:
+                for i in self.db_dati[v]:
+                    for j in i:
+                        if v == "darbinieks":
+                            if i.index(j) == 1 or i.index(j) == 2 or i.index(j) == 3:
+                                if j == data[count][i.index(j)]:
+                                    sakritosie_dati["darbinieks"][1]+=1
+                        elif v == "darba_devejs":
+                            if i.index(j) == 1 or i.index(j) == 2:
+                                if j == data[count][i.index(j)]:
+                                    sakritosie_dati["darba_devejs"][1]+=1
+                        else:
+                            if i.index(j) == 1:
+                                if j == data[count][i.index(j)]:
+                                    sakritosie_dati["alga"][1]+=1
+                # print(self.db_dati[v],data[count])
+            else:
+                print("empty data")
+            count+=1
+        for i in sakritosie_dati:
+            if i == "darba_devejs":
+                if sakritosie_dati[i][1] == 2:
+                    sakritosie_dati[i][0] = True
+            elif i == "darbinieks":
+                if sakritosie_dati[i][1] == 3:
+                    sakritosie_dati[i][0] = True
+            else:
+                if sakritosie_dati[i][1] == 1:
+                    sakritosie_dati[i][0] = True
+        
+        return sakritosie_dati
+
+
 
         
     def saglabasana(self,veids):
@@ -99,16 +144,28 @@ class Alganators(): # Definē klasi Alganators
 
             structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
             structures = self.pieskir_index(structures,indeksi)
+            parbaude = self.datu_parbaude(structures)
+            structures = self.pieskir_index(structures,indeksi,parbaude)
+            # print(structures)
 
+            keys=[]
+            for key in sql.keys():
+                keys.append(key)
+
+            count=0
+            for v in parbaude:
+                if not parbaude[v][0]:
+                    pass
+                else:
+                    sql.pop(keys[count])
+                count += 1
             count = 0
             for i in sql:
-                self.cursor.execute(sql[i],structures[count])
-                self.db.commit()
                 count += 1
 
-stradnieks = Alganators(2000,0,"Guntars","Tutins","040400-0404","SIA PLEĶĪŠI","Aleksandrs","Sātīgais") # Objekta izveide
-# print(stradnieks.algas_formula()) # metodes izvade
-# stradnieks.saglabasana("db")
+stradnieks = Alganators(2000,0,"Guntars","Tutins","040400-0404","SIA PEĻĶĪTE","Aleksandrs","Sātīgais") # Objekta izveide
+print(stradnieks.algas_formula()) # metodes izvade
+stradnieks.saglabasana("db")
 
 def mainApp():
     customtkinter.set_appearance_mode("System")
@@ -163,4 +220,4 @@ def mainApp():
     root.mainloop()
 
 
-mainApp()
+# mainApp()
