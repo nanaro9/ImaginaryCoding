@@ -19,8 +19,8 @@ class Alganators(): # Definē klasi Alganators
         self.darbinieks_vards = darbinieks_vards # Vienkārši definē tukšu mainīgo
         self.darbinieks_uzvards = darbinieks_uzvards # Vienkārši definē tukšu mainīgo
         self.darbinieks_pk = darbinieks_pk # Vienkārši definē tukšu mainīgo
-        self.darbinieks_alga = darbinieks_alga # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_alga"
-        self.darbinieks_berni = darbinieks_berni # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_berni"
+        self.darbinieks_alga = float(darbinieks_alga) # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_alga"
+        self.darbinieks_berni = int(darbinieks_berni) # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_berni"
         self.darba_devejs_vards = darba_devejs_vards # Vienkārši definē tukšu mainīgo
         self.darba_devejs_uzvards = darba_devejs_uzvards # Vienkārši definē tukšu mainīgo
         self.uznemums = uznemums # Vienkārši definē tukšu mainīgo
@@ -155,10 +155,6 @@ class Alganators(): # Definē klasi Alganators
             else:
                 print("Dati nav unique")
 
-stradnieks = Alganators(2000,0,"Guntaars","Tutens","050400-0404","SIA PEĻĶĪTE","Apeksandrs","Sūtīgais") # Objekta izveide
-print(stradnieks.algas_formula()) # metodes izvade
-# stradnieks.saglabasana("db")
-
 def mainApp():
     customtkinter.set_appearance_mode("System")
     customtkinter.set_default_color_theme("blue")
@@ -170,20 +166,94 @@ def mainApp():
     root.grid_columnconfigure((0,1),weight=1)
     root.grid_rowconfigure(0,weight=1)
 
+    def errorFrame(text):
+        frame = customtkinter.CTkToplevel(master=root)
+        frame.geometry("1000x200")
+        frame.resizable(False,False)
+        frame.title("Uzmanību!")
+        frame.attributes('-topmost', 'true')
+
+        errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center")
+        errorMSG.pack(padx=50, pady=50)
+
+    def outputFrame(data):
+        frame = customtkinter.CTkToplevel(master=root)
+        frame.geometry("700x350")
+        frame.resizable(False,False)
+        frame.title("Algas aprēķina programma")
+        frame.attributes('-topmost', 'true')
+        
+        name=data["Vārds/Uzvārds"].split(" ")
+        ddName=data["Darba devējs"].split(" ")
+
+        obj = Alganators(data["Bruto alga"],data["Bērnu skaits"],name[0],name[1],data["Personas Kods"],data["Uzņēmums"],ddName[0],ddName[1])
+        obj_alga = obj.algas_formula()
+
+        innerFrame = customtkinter.CTkFrame(master=frame)
+        innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
+
+        label = customtkinter.CTkLabel(master=innerFrame, text="Algas aprēķina programma", font=("Roboto",22))
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
+
+        nameLabel = customtkinter.CTkLabel (master=innerFrame, text=f"Vārds/Uzvārds: {data['Vārds/Uzvārds']}")
+        pkLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Personas Kods: {data['Personas Kods']}")
+        brutoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bruto Alga: {data['Bruto alga']}")
+        childLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bērnu Skaits: {data['Bērnu skaits']}")
+        ddLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Darba Devējs (Vārds/Uzvārds): {data['Darba devējs']}")
+        companyLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Uzņēmums: {data['Uzņēmums']}")
+            
+        nameLabel.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
+        pkLabel.grid(pady=5,padx=10,sticky="nsew",row=2)
+        brutoLabel.grid(pady=5,padx=10,sticky="nsew",row=3)
+        childLabel.grid(pady=5,padx=10,sticky="nsew",row=4)
+        ddLabel.grid(pady=5,padx=10,sticky="nsew",row=5)
+        companyLabel.grid(pady=5,padx=10,sticky="nsew",row=6)
+
+        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {obj_alga}", font=("Roboto",20),justify="center",wraplength=150)
+        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
+
+        calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14))
+        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14))
+        calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1)
+        saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2)
+
+        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024")
+        author.pack()
+
     def inputFrame():
         frame = customtkinter.CTkFrame(master=root)
         frame.pack(pady=10, padx=20, fill="both", expand=True)
 
+        def check():
+            data = {"Vārds/Uzvārds":nameEntry.get(),"Personas Kods":pkEntry.get(),"Bruto alga":brutoEntry.get(),"Bērnu skaits":childEntry.get(),"Darba devējs":ddEntry.get(),"Uzņēmums":companyEntry.get()}
+            for i in data:
+                if data[i]=='':
+                    errorFrame(f"{i} lauciņš palika tukšs!")
+                    return False
+                if i == "Vārds/Uzvārds" or i == "Darba devējs" or i == "Uzņēmums":
+                    if data[i].isdigit():
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        return False
+                if i == "Personas Kods":
+                    if len(data[i]) < 12:
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        return False
+                    if not data[i][:6].isdigit() or not data[i][7:].isdigit():
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        return False
+            outputFrame(data)
+
+
         label = customtkinter.CTkLabel(master=frame, text="Algas aprēķina programma", font=("Roboto",22))
         label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
-
         nameEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Vārds/Uzvārds")
         pkEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Personas Kods")
         brutoEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bruto Alga")
         childEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bērnu Skaits")
         ddEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Darba Devējs (Vārds/Uzvārds)")
         companyEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Uzņēmums")
-        aprekinatButton = customtkinter.CTkButton(master=frame, text="Aprēķināt")
+        aprekinatButton = customtkinter.CTkButton(master=frame, text="Aprēķināt", command=check)
+
         nameEntry.grid(pady=5,padx=10,sticky="nsew",row=1)
         pkEntry.grid(pady=5,padx=10,sticky="nsew",row=2)
         brutoEntry.grid(pady=5,padx=10,sticky="nsew",row=3)
@@ -198,15 +268,8 @@ def mainApp():
     def loginFrame():   
         def login():
             Input_credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()}
-            if Input_credentials["Login_Input"] != "Admin" and Input_credentials["Password_Input"] != "Password":
-                frame = customtkinter.CTkToplevel(master=loginframe)
-                frame.geometry("1000x200")
-                frame.resizable(False,False)
-                frame.title("Uzmanību!")
-                frame.attributes('-topmost', 'true')
-
-                errorMSG = customtkinter.CTkLabel(master=frame, text=("Uzmanību! Lietotājvārds vai parole tika ievadīta nepareizi!"), font=("Roboto",32), anchor="center")
-                errorMSG.pack(padx=50, pady=50)
+            if Input_credentials["Login_Input"] != "Admin" and Input_credentials["Password_Input"] != "password":
+                errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!")
             else:
                 loginframe.destroy()
                 inputFrame()
