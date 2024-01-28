@@ -157,7 +157,7 @@ class Alganators(): # Definē klasi Alganators
 
 stradnieks = Alganators(2000,0,"Guntaars","Tutens","050400-0404","SIA PEĻĶĪTE","Apeksandrs","Sūtīgais") # Objekta izveide
 print(stradnieks.algas_formula()) # metodes izvade
-stradnieks.saglabasana("db")
+# stradnieks.saglabasana("db")
 
 def mainApp():
     customtkinter.set_appearance_mode("System")
@@ -167,6 +167,33 @@ def mainApp():
     root.geometry("500x350")
     root.title("Algas aprēķina programma")
     root.resizable(False,False)
+    root.grid_columnconfigure((0,1),weight=1)
+    root.grid_rowconfigure(0,weight=1)
+
+    def inputFrame():
+        frame = customtkinter.CTkFrame(master=root)
+        frame.pack(pady=10, padx=20, fill="both", expand=True)
+
+        label = customtkinter.CTkLabel(master=frame, text="Algas aprēķina programma", font=("Roboto",22))
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
+
+        nameEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Vārds/Uzvārds")
+        pkEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Personas Kods")
+        brutoEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bruto Alga")
+        childEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bērnu Skaits")
+        ddEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Darba Devējs (Vārds/Uzvārds)")
+        companyEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Uzņēmums")
+        aprekinatButton = customtkinter.CTkButton(master=frame, text="Aprēķināt")
+        nameEntry.grid(pady=5,padx=10,sticky="nsew",row=1)
+        pkEntry.grid(pady=5,padx=10,sticky="nsew",row=2)
+        brutoEntry.grid(pady=5,padx=10,sticky="nsew",row=3)
+        childEntry.grid(pady=5,padx=10,sticky="nsew",row=4)
+        ddEntry.grid(pady=5,padx=10,sticky="nsew",row=5)
+        companyEntry.grid(pady=5,padx=10,sticky="nsew",row=6)
+        aprekinatButton.grid(pady=5,padx=5,row=6,column=1)
+
+        author = customtkinter.CTkLabel(master=root,text="© Aleksis Počs 2024")
+        author.pack()
 
     def loginFrame():   
         def login():
@@ -176,13 +203,18 @@ def mainApp():
                 frame.geometry("1000x200")
                 frame.resizable(False,False)
                 frame.title("Uzmanību!")
+                frame.attributes('-topmost', 'true')
 
                 errorMSG = customtkinter.CTkLabel(master=frame, text=("Uzmanību! Lietotājvārds vai parole tika ievadīta nepareizi!"), font=("Roboto",32), anchor="center")
                 errorMSG.pack(padx=50, pady=50)
             else:
                 loginframe.destroy()
+                inputFrame()
+
         def guest():
             loginframe.destroy()
+            inputFrame()
+            
         loginframe = customtkinter.CTkFrame(master=root)
         loginframe.pack(pady=20, padx=60, fill="both", expand=True)
 
@@ -200,16 +232,10 @@ def mainApp():
 
         guestButton = customtkinter.CTkButton(master=loginframe, text="Viesa režīms", command=guest)
         guestButton.pack(pady=12,padx=10)
-        
-        
-
-
-    def guest():
-        pass
 
     loginFrame()
 
     root.mainloop()
 
 
-# mainApp()
+mainApp()
