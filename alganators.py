@@ -1,6 +1,7 @@
 # Programmas autors - Aleksis Počs
 # Izstrādāta 5. tēmas ietvaros
 
+import os
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
 import customtkinter
 import base64
@@ -118,8 +119,21 @@ class Alganators(): # Definē klasi Alganators
         return False
 
     def saglabasana(self,veids):
+        alga_data_structure = [self.data["Uznemums"],self.algas_formula()]
+        darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]]
+        darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]]
+
         if veids == "txt":
-            pass
+            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt"):
+                savingData = f"\n-Algas aprēķināšanas kopsavilkums-\n Vārds/Uzvārds: {darbinieks_data_structure[0]} {darbinieks_data_structure[1]}\nPersonas kods: {darbinieks_data_structure[2]}\nBērnu skaits {darbinieks_data_structure[3]}\nBruto alga: {darbinieks_data_structure[4]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[0]} {darba_devejs_data_structure[1]}\nUzņēmums: {alga_data_structure[0]}\n\nNETO ALGA: {alga_data_structure[1]}\n"
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt", "a",encoding="utf8")
+                f.write(savingData)
+                f.close()
+            else:
+                savingData = f"-Algas aprēķināšanas kopsavilkums-\n Vārds/Uzvārds: {darbinieks_data_structure[0]} {darbinieks_data_structure[1]}\nPersonas kods: {darbinieks_data_structure[2]}\nBērnu skaits {darbinieks_data_structure[3]}\nBruto alga: {darbinieks_data_structure[4]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[0]} {darba_devejs_data_structure[1]}\nUzņēmums: {alga_data_structure[0]}\n\nNETO ALGA: {alga_data_structure[1]}"
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt", "w",encoding="utf8")
+                f.write(savingData)
+                f.close()
         elif veids == "db":
 
             sql = {
@@ -127,10 +141,6 @@ class Alganators(): # Definē klasi Alganators
                 "Darba Devejs":("""insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s,%s, %s);"""),
                 "Alga":("""insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);""")
                 }
-            
-            alga_data_structure = [self.data["Uznemums"],self.algas_formula()]
-            darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]]
-            darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]]
 
             indeksi = []
 
@@ -174,7 +184,7 @@ def mainApp():
 
     def stepsFrame(data,obj_alga):
         frame = customtkinter.CTkToplevel(master=root)
-        frame.geometry("700x350")
+        frame.geometry("700x400")
         frame.resizable(False,False)
         frame.title("Algas aprēķina programma")
         frame.attributes('-topmost', 'true')
@@ -203,20 +213,25 @@ def mainApp():
             step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
         else:
             step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}")
-            iin_baze = (int(data['Bruto alga']) - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
+            iin_baze = (1667 - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
             step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}")
             if iin_baze > 0:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}")
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}")
             else:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
                 iin_baze = 0
-            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze * 20% = {iin_baze * 0.2}")
-            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Neto alga]: Bruto alga - SN - IIN = {obj_alga}")
+            parpalikums = int(data['Bruto alga']) - 1667
+            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze - 10.5% = {iin_baze * 0.105}")
+            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Pārpalikums]: Bruto alga - 1667 = {parpalikums}")
+            step6 = customtkinter.CTkLabel (master=innerFrame, text=f"6. Solis [IIN 2]: Pārpalikums * 23% = {parpalikums * 0.23}")
+            step7 = customtkinter.CTkLabel (master=innerFrame, text=f"7. Solis [Neto alga]: Bruto alga - SN - IIN - IIN 2 = {obj_alga}")
             step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
             step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0)
             step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0)
             step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0)
             step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
+            step6.grid(pady=5,padx=10,sticky="nsew",row=6,column=0)
+            step7.grid(pady=5,padx=10,sticky="nsew",row=7,column=0)
 
 
         netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
@@ -262,7 +277,7 @@ def mainApp():
         netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
 
         calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga))
-        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14))
+        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: obj.saglabasana("txt"))
         calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1)
         saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2)
 
