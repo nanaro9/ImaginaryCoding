@@ -209,7 +209,7 @@ def mainApp():
         ddLabel.grid(pady=5,padx=10,sticky="nsew",row=5)
         companyLabel.grid(pady=5,padx=10,sticky="nsew",row=6)
 
-        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {obj_alga}", font=("Roboto",20),justify="center",wraplength=150)
+        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
         netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
 
         calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14))
@@ -234,11 +234,20 @@ def mainApp():
                     if data[i].isdigit():
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
                         return False
+                    if i == "Vārds/Uzvārds" or i == "Darba devējs":
+                        if len(data[i].split(" ")) != 2:
+                            print(len(data[i].split(" ")))
+                            errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                            return False
                 if i == "Personas Kods":
                     if len(data[i]) < 12:
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
                         return False
-                    if not data[i][:6].isdigit() or not data[i][7:].isdigit():
+                    if not data[i][:6].isdigit() or not data[i][7:].isdigit() or data[i][6] != "-":
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        return False
+                if i == "Bruto alga" or i == "Bērnu skaits":
+                    if not data[i].isdigit():
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
                         return False
             outputFrame(data)
