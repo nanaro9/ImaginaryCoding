@@ -4,8 +4,14 @@
 import os
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
 import customtkinter
-import base64
 from cryptography.fernet import Fernet
+import pyotp
+import qrcode
+
+key = 'XGT2BDNVJBTU2JFQCRAVCQPYNFZI2RVI'
+totp = pyotp.TOTP(key)
+# uri = totp.provisioning_uri(name="Admin",issuer_name="Algas aprēķina programma")
+# qrcode.make(uri).save("qrcode.png")
 
 class Alganators(): # Definē klasi Alganators
     def __init__(self,darbinieks_alga,darbinieks_berni,darbinieks_vards,darbinieks_uzvards,darbinieks_pk,uznemums,darba_devejs_vards,darba_devejs_uzvards): # Klases sākuma uzstādīšana
@@ -134,6 +140,7 @@ class Alganators(): # Definē klasi Alganators
                 f = open(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt", "w",encoding="utf8")
                 f.write(savingData)
                 f.close()
+            self.saglabasana("db")
         elif veids == "db":
 
             sql = {
@@ -340,10 +347,10 @@ def mainApp():
 
     def loginFrame():   
         def login():
-            Input_credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()}
-            if Input_credentials["Login_Input"] != "Admin" and Input_credentials["Password_Input"] != "password":
+            credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()}
+            if credentials["Login_Input"] != "Admin" or not totp.verify(credentials["Password_Input"]):
                 errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!")
-            else:
+            elif credentials["Login_Input"] == "Admin" or totp.verify(credentials["Password_Input"]):
                 loginframe.destroy()
                 inputFrame()
 
@@ -360,7 +367,7 @@ def mainApp():
         loginEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Lietotājvārds")
         loginEntry.pack(pady=12,padx=10)
 
-        passwordEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Parole", show="*")
+        passwordEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Key", show="*")
         passwordEntry.pack(pady=12,padx=10)
 
         loginbutton = customtkinter.CTkButton(master=loginframe, text="Pieslēgties", command=login)
