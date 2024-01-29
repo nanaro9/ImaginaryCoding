@@ -115,12 +115,8 @@ class Alganators(): # Definē klasi Alganators
                 if sakritosie_dati[i][1] == 1:
                     sakritosie_dati[i][0] = True
                     return sakritosie_dati[i][0]
-            
         return False
 
-
-
-        
     def saglabasana(self,veids):
         if veids == "txt":
             pass
@@ -176,6 +172,59 @@ def mainApp():
         errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center")
         errorMSG.pack(padx=50, pady=50)
 
+    def stepsFrame(data,obj_alga):
+        frame = customtkinter.CTkToplevel(master=root)
+        frame.geometry("700x350")
+        frame.resizable(False,False)
+        frame.title("Algas aprēķina programma")
+        frame.attributes('-topmost', 'true')
+
+        innerFrame = customtkinter.CTkFrame(master=frame)
+        innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
+
+        label = customtkinter.CTkLabel(master=innerFrame, text="Aprēķina soļi", font=("Roboto",22))
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
+
+        if int(data["Bruto alga"]) < 1667:
+            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}")
+            iin_baze = (int(data['Bruto alga']) - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
+            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}")
+            if iin_baze > 0:
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}")
+            else:
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
+                iin_baze = 0
+            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze * 20% = {iin_baze * 0.2}")
+            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Neto alga]: Bruto alga - SN - IIN = {obj_alga}")
+            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
+            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0)
+            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0)
+            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0)
+            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
+        else:
+            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}")
+            iin_baze = (int(data['Bruto alga']) - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
+            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}")
+            if iin_baze > 0:
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}")
+            else:
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
+                iin_baze = 0
+            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze * 20% = {iin_baze * 0.2}")
+            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Neto alga]: Bruto alga - SN - IIN = {obj_alga}")
+            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
+            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0)
+            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0)
+            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0)
+            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
+
+
+        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
+        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
+
+        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024")
+        author.pack()
+
     def outputFrame(data):
         frame = customtkinter.CTkToplevel(master=root)
         frame.geometry("700x350")
@@ -212,7 +261,7 @@ def mainApp():
         netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
         netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
 
-        calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14))
+        calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga))
         saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14))
         calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1)
         saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2)
@@ -308,6 +357,5 @@ def mainApp():
     loginFrame()
 
     root.mainloop()
-
 
 mainApp()
