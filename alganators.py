@@ -32,9 +32,6 @@ class Alganators(): # Definē klasi Alganators
         self.darba_devejs_uzvards = darba_devejs_uzvards # Vienkārši definē tukšu mainīgo
         self.uznemums = uznemums # Vienkārši definē tukšu mainīgo
 
-        self.atslega = b'PpPPPPpAaaaAAAaSsssssssWwwWwwwwwwOOooooRRDD='
-        self.objekts = Fernet(self.atslega)
-
         self.data = {"Darbinieks": {"Vards":darbinieks_vards,"Uzvards":darbinieks_uzvards,"Personas_kods":darbinieks_pk,"Berni":darbinieks_berni,"Alga":darbinieks_alga},"darba_Devejs":{"Vards":darba_devejs_vards,"Uzvards":darba_devejs_uzvards},"Uznemums":uznemums} # vārdnīcas izveide, kurā tiks glabāti ievadītie dati
 
         self.db = mysql.connector.connect(host="localhost",database="algaprekins",user="root",password="password") # Programma tiek savienota ar datu bāzi, kuras nosaukums ir "algaprekins"
