@@ -1,0 +1,10 @@
+-Algas aprēķināšanas kopsavilkums-
+Vārds/Uzvārds: Aleksis Počs
+Personas kods: 121205-21424
+Bērnu skaits 0
+Bruto alga: 2000
+
+Darba devējs (Vārds/Uzvārds): a a
+Uzņēmums: sia abc
+
+NETO ALGA: 1422.01

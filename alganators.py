@@ -86,6 +86,9 @@ class Alganators(): # Definē klasi Alganators
     
     def datu_parbaude(self,data):
         count = 0
+        for v in self.veids:
+            self.cursor.execute(f"SELECT * FROM {v}")
+            self.db_dati[v] = self.cursor.fetchall()
         sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
         for v in self.db_dati:
             if self.db_dati[v] != []:
@@ -103,8 +106,6 @@ class Alganators(): # Definē klasi Alganators
                             if i.index(j) == 1:
                                 if j == data[count][i.index(j)]:
                                     sakritosie_dati["alga"][1]+=1
-            else:
-                print("empty data")
             count+=1
         for i in sakritosie_dati:
             if i == "darba_devejs":
@@ -112,7 +113,7 @@ class Alganators(): # Definē klasi Alganators
                     sakritosie_dati[i][0] = True
                     return sakritosie_dati[i][0]
             elif i == "darbinieks":
-                if sakritosie_dati[i][1] == 3:
+                if sakritosie_dati[i][1] >= 1:
                     sakritosie_dati[i][0] = True
                     return sakritosie_dati[i][0]
             else:
@@ -121,49 +122,47 @@ class Alganators(): # Definē klasi Alganators
                     return sakritosie_dati[i][0]
         return False
 
-    def saglabasana(self,veids):
+    def saglabasana(self):
         alga_data_structure = [self.data["Uznemums"],self.algas_formula()]
         darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]]
         darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]]
 
-        if veids == "txt":
-            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt"):
-                savingData = f"\n-Algas aprēķināšanas kopsavilkums-\n Vārds/Uzvārds: {darbinieks_data_structure[0]} {darbinieks_data_structure[1]}\nPersonas kods: {darbinieks_data_structure[2]}\nBērnu skaits {darbinieks_data_structure[3]}\nBruto alga: {darbinieks_data_structure[4]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[0]} {darba_devejs_data_structure[1]}\nUzņēmums: {alga_data_structure[0]}\n\nNETO ALGA: {alga_data_structure[1]}\n"
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt", "a",encoding="utf8")
+        sql = {
+            "Darbinieks":("""insert into darbinieks (ID_darbinieks, darbinieks_vards, darbinieks_uzvards, darbinieks_pk, darbinieks_berni, darbinieks_alga) values (%s, %s, %s, %s,%s, %s);"""),
+            "Darba Devejs":("""insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s,%s, %s);"""),
+            "Alga":("""insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);""")
+            }
+
+        indeksi = []
+
+        for v in self.veids:
+            self.cursor.execute(f"SELECT * FROM {v}")
+            indeksi.append(self.index_parbaude(self.cursor.fetchall()))
+
+        structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
+        structures = self.pieskir_index(structures,indeksi)
+        parbaude = self.datu_parbaude(structures)
+        count=0
+        if not parbaude:
+            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt"):
+                savingData = f"\n-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n"
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8")
                 f.write(savingData)
                 f.close()
             else:
-                savingData = f"-Algas aprēķināšanas kopsavilkums-\n Vārds/Uzvārds: {darbinieks_data_structure[0]} {darbinieks_data_structure[1]}\nPersonas kods: {darbinieks_data_structure[2]}\nBērnu skaits {darbinieks_data_structure[3]}\nBruto alga: {darbinieks_data_structure[4]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[0]} {darba_devejs_data_structure[1]}\nUzņēmums: {alga_data_structure[0]}\n\nNETO ALGA: {alga_data_structure[1]}"
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[2]}.txt", "w",encoding="utf8")
+                savingData = f"-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n"
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8")
                 f.write(savingData)
                 f.close()
-            self.saglabasana("db")
-        elif veids == "db":
-
-            sql = {
-                "Darbinieks":("""insert into darbinieks (ID_darbinieks, darbinieks_vards, darbinieks_uzvards, darbinieks_pk, darbinieks_berni, darbinieks_alga) values (%s, %s, %s, %s,%s, %s);"""),
-                "Darba Devejs":("""insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s,%s, %s);"""),
-                "Alga":("""insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);""")
-                }
-
-            indeksi = []
-
-            for v in self.veids:
-                self.cursor.execute(f"SELECT * FROM {v}")
-                indeksi.append(self.index_parbaude(self.cursor.fetchall()))
-
-            structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
-            structures = self.pieskir_index(structures,indeksi)
-            parbaude = self.datu_parbaude(structures)
-            count=0
-            if not parbaude:
-                count = 0
-                for i in sql:
-                    self.cursor.execute(sql[i],structures[count])
-                    self.db.commit()
-                    count += 1
-            else:
-                print("Dati nav unique")
+            count = 0
+            for i in sql:
+                self.cursor.execute(sql[i],structures[count])
+                self.db.commit()
+                count += 1
+            return True
+        else:
+            return False
+            
 
 def mainApp():
     customtkinter.set_appearance_mode("System")
@@ -244,6 +243,12 @@ def mainApp():
         author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024")
         author.pack()
 
+    def savingGUI(bool):
+        if bool:
+            print("saved")
+        else:
+            print("fail")
+
     def outputFrame(data):
         frame = customtkinter.CTkToplevel(master=root)
         frame.geometry("700x350")
@@ -281,7 +286,7 @@ def mainApp():
         netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
 
         calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga))
-        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: obj.saglabasana("txt"))
+        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: savingGUI(obj.saglabasana()))
         calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1)
         saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2)
 
@@ -349,7 +354,7 @@ def mainApp():
                 errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!")
             elif credentials["Login_Input"] == "Admin" or totp.verify(credentials["Password_Input"]):
                 loginframe.destroy()
-                inputFrame()
+                print("success")
 
         def guest():
             loginframe.destroy()
