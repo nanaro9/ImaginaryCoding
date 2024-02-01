@@ -162,6 +162,9 @@ class Alganators(): # Definē klasi Alganators
             return True
         else:
             return False
+    
+    def db_dati_return(self):
+        return self.db_dati
             
 
 def mainApp():
@@ -184,6 +187,31 @@ def mainApp():
 
         errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center")
         errorMSG.pack(padx=50, pady=50)
+
+    def editFrame(dbDati):
+        frame = customtkinter.CTkFrame(master=root)
+        frame.pack(pady=10, padx=20, fill="both", expand=True)
+
+        label = customtkinter.CTkLabel(master=frame, text="Speciālais datu piekļuves centrs", font=("Roboto",22))
+        label.pack(pady=12,padx=10)
+
+        entry = customtkinter.CTkEntry(master=frame, placeholder_text="Ievadiet meklējamā informāciju...")
+        entry.pack(pady=12,padx=10)
+
+        optionmenu = customtkinter.CTkOptionMenu(frame, values=["Darbinieks", "Darba Devējs", "Alga"])
+        optionmenu.pack(pady=12,padx=10)
+
+        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"ID"))
+        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"PK"))
+
+        ID_searchButton.pack(pady=12)
+        PK_searchButton.pack(pady=12)
+
+        def searchResults(searchInfo,optionChoice,searchMode):
+            print(searchInfo,optionChoice,searchMode)
+
+
+
 
     def stepsFrame(data,obj_alga):
         frame = customtkinter.CTkToplevel(master=root)
@@ -354,7 +382,7 @@ def mainApp():
                 errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!")
             elif credentials["Login_Input"] == "Admin" or totp.verify(credentials["Password_Input"]):
                 loginframe.destroy()
-                print("success")
+                editFrame(Alganators(0,0,0,0,0,0,0,0).db_dati_return())
 
         def guest():
             loginframe.destroy()
