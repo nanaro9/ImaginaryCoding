@@ -89,7 +89,7 @@ class Alganators(): # Definē klasi Alganators
         for v in self.veids:
             self.cursor.execute(f"SELECT * FROM {v}")
             self.db_dati[v] = self.cursor.fetchall()
-        sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
+        sakritosie_dati = {"darbinieks":[False,0,False],"darba_devejs":[False,0],"alga":[False,0]}
         for v in self.db_dati:
             if self.db_dati[v] != []:
                 for i in self.db_dati[v]:
@@ -98,6 +98,8 @@ class Alganators(): # Definē klasi Alganators
                             if i.index(j) == 1 or i.index(j) == 2 or i.index(j) == 3:
                                 if j == data[count][i.index(j)]:
                                     sakritosie_dati["darbinieks"][1]+=1
+                                    if i.index(j) == 3:
+                                        sakritosie_dati["darbinieks"][2] = True
                         elif v == "darba_devejs":
                             if i.index(j) == 1 or i.index(j) == 2:
                                 if j == data[count][i.index(j)]:
@@ -109,13 +111,18 @@ class Alganators(): # Definē klasi Alganators
             count+=1
         for i in sakritosie_dati:
             if i == "darba_devejs":
-                if sakritosie_dati[i][1] == 2:
+                if sakritosie_dati[i][1] == 1:
                     sakritosie_dati[i][0] = True
                     return sakritosie_dati[i][0]
             elif i == "darbinieks":
-                if sakritosie_dati[i][1] >= 1:
-                    sakritosie_dati[i][0] = True
-                    return sakritosie_dati[i][0]
+                if sakritosie_dati[i][2]:
+                    if sakritosie_dati[i][1] >= 1:
+                        sakritosie_dati[i][0] = True
+                        return sakritosie_dati[i][0]
+                else:
+                    if sakritosie_dati[i][1] >= 2:
+                        sakritosie_dati[i][0] = True
+                        return sakritosie_dati[i][0]
             else:
                 if sakritosie_dati[i][1] == 1:
                     sakritosie_dati[i][0] = True
@@ -162,9 +169,20 @@ class Alganators(): # Definē klasi Alganators
             return True
         else:
             return False
+        
+    def db_upd(self):
+        for v in self.veids:
+            self.cursor.execute(f"SELECT * FROM {v}")
+            self.db_dati[v] = self.cursor.fetchall()
     
     def db_dati_return(self):
+        self.db_upd()
         return self.db_dati
+    
+    def editDb(self,sql):
+        self.db_upd()
+        self.cursor.execute(sql)
+        self.db.commit()
             
 
 def mainApp():
@@ -201,13 +219,14 @@ def mainApp():
         optionmenu = customtkinter.CTkOptionMenu(frame, values=["Darbinieks", "Darba Devējs", "Alga"])
         optionmenu.pack(pady=12,padx=10)
 
-        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: editFrame(searchResults(entry.get(),optionmenu.get(),"ID")))
-        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: editFrame(searchResults(entry.get(),optionmenu.get(),"PK")))
+        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"ID"))
+        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"PK"))
 
         ID_searchButton.pack(pady=12)
         PK_searchButton.pack(pady=12)
 
         def searchResults(searchInfo,optionChoice,searchMode):
+            dbDati = Alganators(0,0,0,0,0,0,0,0).db_dati_return()
             options = ["darbinieks","darba_devejs","alga"]
 
             if optionChoice == "Darbinieks":
@@ -223,7 +242,7 @@ def mainApp():
                     for i in dbDati[optionChoice]:
                         if int(searchInfo) == i[0]:
                             found = True
-                            return [optionChoice,i]
+                            editFrame([optionChoice,i])
                     if not found:
                         errorFrame("Dati ar šādu ID neeksistē!")
                 else:
@@ -234,7 +253,7 @@ def mainApp():
                     for i in dbDati[optionChoice]:
                         if searchInfo == i[3]:
                             found = True
-                            return [optionChoice,i]
+                            editFrame([optionChoice,i])
                     if not found:
                         errorFrame("Datu ar šādu Personas kodu neeksistē!")
                 else:
@@ -244,7 +263,7 @@ def mainApp():
         def datu_parbaude(data):
             count = 0
             sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
-            print(dbDati,data)
+            # print(dbDati,data)
 
         def editFrame(EditData):
             frame = customtkinter.CTkToplevel(master=root)
@@ -260,11 +279,11 @@ def mainApp():
             label.pack(pady=12)
 
 
-            optionList = {"darbinieks":["Vārds","Uzvārds","Personas Kods","Bērnu Skaits","Bruto Alga"],"darba_devejs":["Vārds","Uzvārds"],"alga":["Neto Alga"]}
+            optionList = {"darbinieks":["Vārds","Uzvārds","Personas Kods","Bērnu Skaits","Bruto Alga"],"darba_devejs":["Vārds","Uzvārds"],"alga":["Uzņēmums","Neto Alga"]}
 
             idx = 0
             for v in EditData[1][1:]:
-                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[idx]}: {str(v)}", font=("Roboto",18))
+                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[EditData[0]][idx]}: {str(v)}", font=("Roboto",18))
                 dataLabel.pack(pady=12)
                 idx+=1
 
@@ -289,41 +308,63 @@ def mainApp():
                 entry = customtkinter.CTkEntry(master=innerFrame, placeholder_text="Ievadiet vērtību aizstāšanai",width=600)
                 entry.pack(pady=12)
 
-                btn = customtkinter.CTkButton(master=innerFrame, text="Rediģēt/Aizstāt",width=400,command=lambda:check(editData[1],editData[0],data_to_edit))
+                btn = customtkinter.CTkButton(master=innerFrame, text="Rediģēt/Aizstāt",width=400,command=lambda:check(entry.get(),editData[1],editData[0],data_to_edit))
                 btn.pack(pady=12)
 
-            def check(data,option,optionOption):
-                for i in data:
-                        if i=='':
-                            errorFrame(f"lauciņš palika tukšs!")
+            def check(entryData,data,option,optionOption):
+                if entryData == '':
+                    errorFrame(f"lauciņš palika tukšs!")
+                    return False
+                if optionOption == "Uzņēmums":
+                    if entryData.isdigit():
+                        errorFrame(f"lauciņš netika aizpildīts korekti!")
+                        return False
+                if option == "darbinieks" or option == "darba_devejs":
+                    if optionOption == "Vārds" or optionOption == "Uzvārds":
+                            if entryData.isdigit():
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False
+                if optionOption == "Personas Kods":
+                    if len(entryData) < 12:
+                        errorFrame(f"lauciņš netika aizpildīts korekti!")
+                        return False
+                    if not entryData[:6].isdigit() or not entryData[7:].isdigit() or entryData[6] != "-":
+                        errorFrame(f"lauciņš netika aizpildīts korekti!")
+                        return False
+                if optionOption == "Bruto Alga" or optionOption == "Bērnu Skaits" or optionOption == "Neto Alga":
+                    if not entryData.isdigit():
+                        errorFrame(f"lauciņš netika aizpildīts korekti!")
+                        return False
+                    
+                valIdx = {"darbinieks":{"Vārds":1,"Uzvārds":2,"Personas Kods":3,"Bērnu Skaits":4,"Bruto Alga":5},"darba_devejs":{"Vārds":1,"Uzvārds":2},"alga":{"Uzņēmums":1,"Neto Alga":2}}
+                
+                if entryData == data[valIdx[option][optionOption]]:
+                    errorFrame("Ievadiet JAUNUS datus!")
+                    return False
+                
+                if option == "darbinieks" or "darba_devejs":
+                    if optionOption == "Vārds":
+                        for i in dbDati[option]:
+                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Uzvārds"]] == i[valIdx[option]["Uzvārds"]]:
+                                errorFrame("Šādi dati jau iekļauti datu bāzē!")
+                                return False
+                    elif optionOption == "Uzvārds":
+                        for i in dbDati[option]:
+                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Vārds"]] == i[valIdx[option]["Vārds"]]:
+                                errorFrame("Šādi dati jau iekļauti datu bāzē!")
+                                return False
+                            
+                if optionOption == "Personas Kods" or "Uzņēmums":
+                    for i in dbDati[option]:
+                        if entryData == i[valIdx[option][optionOption]]:
+                            errorFrame("Šādi dati jau iekļauti datu bāzē!")
                             return False
-                if option == "darbinieks":
-                    for i in data:
-                        if optionOption == "Vārds" or optionOption == "Uzvārds":
-                            if i.isdigit():
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False
-                        if optionOption == "Personas Kods":
-                            if len(i) < 12:
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False
-                            if not i[:6].isdigit() or not i[7:].isdigit() or i[6] != "-":
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False
-                        if optionOption == "Bruto alga" or optionOption == "Bērnu skaits":
-                            if not i.isdigit():
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False
-                if option == "darba_devejs":
-                    for i in data:
-                        if optionOption == "Vārds" or optionOption == "Uzvārds":
-                            if i.isdigit():
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False                        
 
-
-
-
+                tableNames = {"darbinieks":{"Vārds":"darbinieks_vards","Uzvārds":"darbinieks_uzvards","Personas Kods":"darbinieks_pk","Bērnu Skaits":"darbinieks_berni","Bruto Alga":"darbinieks_alga"},"darba_devejs":{"Vārds":"darba_devejs_vards","Uzvārds":"darba_devejs_uzvards"},"alga":{"Uzņēmums":"uznemums","Neto Alga":"neto_alga"}}
+                # sqlInsert = f"""UPDATE {tableNames[option][optionOption]} SET  = {entryData} WHERE {tableNames[option][optionOption]} = {data[valIdx[option][optionOption]]}"""
+                # sqlInsert = (option,tableNames[option][optionOption],{entryData},option,data[0])
+                sqlQuery = ("UPDATE %s SET %s = '%s' WHERE ID_%s ='%s' " % (option,tableNames[option][optionOption],entryData,option,data[0]))
+                Alganators(0,0,0,0,0,0,0,0).editDb(sqlQuery)
 
     def stepsFrame(data,obj_alga):
         frame = customtkinter.CTkToplevel(master=root)

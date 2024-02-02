@@ -1,0 +1,10 @@
+-Algas aprēķināšanas kopsavilkums-
+Vārds/Uzvārds: Aleksis Pochs
+Personas kods: 121205-21222
+Bērnu skaits 0
+Bruto alga: 123
+
+Darba devējs (Vārds/Uzvārds): p p
+Uzņēmums: sia P
+
+NETO ALGA: 88.06800000000001
