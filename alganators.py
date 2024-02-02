@@ -201,14 +201,126 @@ def mainApp():
         optionmenu = customtkinter.CTkOptionMenu(frame, values=["Darbinieks", "Darba Devējs", "Alga"])
         optionmenu.pack(pady=12,padx=10)
 
-        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"ID"))
-        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"PK"))
+        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: editFrame(searchResults(entry.get(),optionmenu.get(),"ID")))
+        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: editFrame(searchResults(entry.get(),optionmenu.get(),"PK")))
 
         ID_searchButton.pack(pady=12)
         PK_searchButton.pack(pady=12)
 
         def searchResults(searchInfo,optionChoice,searchMode):
-            print(searchInfo,optionChoice,searchMode)
+            options = ["darbinieks","darba_devejs","alga"]
+
+            if optionChoice == "Darbinieks":
+                optionChoice = options[0]
+            elif optionChoice == "Darba Devējs":
+                optionChoice = options[1]
+            else:
+                optionChoice = options[2]
+
+            if searchMode == "ID":
+                if searchInfo.isdigit():
+                    found = False
+                    for i in dbDati[optionChoice]:
+                        if int(searchInfo) == i[0]:
+                            found = True
+                            return [optionChoice,i]
+                    if not found:
+                        errorFrame("Dati ar šādu ID neeksistē!")
+                else:
+                    errorFrame("Nepareizi ievadīts ID")
+            elif searchMode == "PK":
+                if optionChoice == "darbinieks":
+                    found = False
+                    for i in dbDati[optionChoice]:
+                        if searchInfo == i[3]:
+                            found = True
+                            return [optionChoice,i]
+                    if not found:
+                        errorFrame("Datu ar šādu Personas kodu neeksistē!")
+                else:
+                    errorFrame("Meklēšana TIKAI DARBINIEKA DATIEM!")
+
+
+        def datu_parbaude(data):
+            count = 0
+            sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
+            print(dbDati,data)
+
+        def editFrame(EditData):
+            frame = customtkinter.CTkToplevel(master=root)
+            frame.geometry("700x450")
+            frame.resizable(False,False)
+            frame.title("Algas aprēķina programma")
+            frame.attributes('-topmost', 'true')
+
+            innerFrame = customtkinter.CTkFrame(master=frame)
+            innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
+
+            label = customtkinter.CTkLabel(master=innerFrame, text="Datu Rediģēšana", font=("Roboto",22))
+            label.pack(pady=12)
+
+
+            optionList = {"darbinieks":["Vārds","Uzvārds","Personas Kods","Bērnu Skaits","Bruto Alga"],"darba_devejs":["Vārds","Uzvārds"],"alga":["Neto Alga"]}
+
+            idx = 0
+            for v in EditData[1][1:]:
+                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[idx]}: {str(v)}", font=("Roboto",18))
+                dataLabel.pack(pady=12)
+                idx+=1
+
+            optionmenu = customtkinter.CTkOptionMenu(frame, values=optionList[EditData[0]])
+            optionmenu.pack(pady=12)
+
+            EditBtn = customtkinter.CTkButton(master=frame,text="Rediģēt Izvēlētos Datus",font=("Roboto",14),command=lambda: popupEdit(optionmenu.get(),EditData))
+            EditBtn.pack(pady=12)
+
+            def destroyEditFrameContents():
+                for f in innerFrame.winfo_children():
+                    f.destroy()
+                optionmenu.destroy()
+                EditBtn.destroy()
+
+            def popupEdit(data_to_edit,editData):
+                destroyEditFrameContents()
+
+                label = customtkinter.CTkLabel(master=innerFrame, text=f"Datu Rediģēšana ({data_to_edit})", font=("Roboto",22))
+                label.pack(pady=12)
+
+                entry = customtkinter.CTkEntry(master=innerFrame, placeholder_text="Ievadiet vērtību aizstāšanai",width=600)
+                entry.pack(pady=12)
+
+                btn = customtkinter.CTkButton(master=innerFrame, text="Rediģēt/Aizstāt",width=400,command=lambda:check(editData[1],editData[0],data_to_edit))
+                btn.pack(pady=12)
+
+            def check(data,option,optionOption):
+                for i in data:
+                        if i=='':
+                            errorFrame(f"lauciņš palika tukšs!")
+                            return False
+                if option == "darbinieks":
+                    for i in data:
+                        if optionOption == "Vārds" or optionOption == "Uzvārds":
+                            if i.isdigit():
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False
+                        if optionOption == "Personas Kods":
+                            if len(i) < 12:
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False
+                            if not i[:6].isdigit() or not i[7:].isdigit() or i[6] != "-":
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False
+                        if optionOption == "Bruto alga" or optionOption == "Bērnu skaits":
+                            if not i.isdigit():
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False
+                if option == "darba_devejs":
+                    for i in data:
+                        if optionOption == "Vārds" or optionOption == "Uzvārds":
+                            if i.isdigit():
+                                errorFrame(f"lauciņš netika aizpildīts korekti!")
+                                return False                        
+
 
 
 
