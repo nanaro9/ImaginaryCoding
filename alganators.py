@@ -1,17 +1,16 @@
 # Programmas autors - Aleksis Počs
 # Izstrādāta 5. tēmas ietvaros
 
-import os
+import os # Sistēmas bibliotēka, ar kuras palīdzību šajā programmā tiks pārbaudīta faila esamība
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
-import customtkinter
-from cryptography.fernet import Fernet
-import pyotp
-import qrcode
+import customtkinter # Lietotāja ievades bibliotēka, ērta bibliotēka moderna lietotāja interfeisa izveidei
+import pyotp # "Python one-time password" bibliotēka", jeb bibliotēka pagaidu paroļu izveidei
+import qrcode # Šī bibliotēka tika izmantota vienu reizi, lai izveidot qr kodu, ar kura palīdzību varēja savienot pyotp ar mobilo autentifikatoru, jeb laika paroļu ģeneratoru
 
-key = 'XGT2BDNVJBTU2JFQCRAVCQPYNFZI2RVI'
-totp = pyotp.TOTP(key)
-# uri = totp.provisioning_uri(name="Admin",issuer_name="Algas aprēķina programma")
-# qrcode.make(uri).save("qrcode.png")
+key = 'XGT2BDNVJBTU2JFQCRAVCQPYNFZI2RVI' # base32 atslēgas izveide pyotp bibliotēkai
+totp = pyotp.TOTP(key) # totp izveide, jeb "Pagaidu" paroles izveide, kura balstāz uz laiku. Tā atjaunojas katras 30 sekundes bezgalīgi (Time-Based One Time Password)
+# uri = totp.provisioning_uri(name="Admin",issuer_name="Algas aprēķina programma") # Tika izveidots speciāls URI - Uniform Resource Identifier ar kura palīdzību varēja izveidot qr kodu, kurš savienos mobilo autentifikatoru ar šīm pagaidu, laika parolēm
+# qrcode.make(uri).save("qrcode.png") # qr koda izveide
 
 class Alganators(): # Definē klasi Alganators
     def __init__(self,darbinieks_alga,darbinieks_berni,darbinieks_vards,darbinieks_uzvards,darbinieks_pk,uznemums,darba_devejs_vards,darba_devejs_uzvards): # Klases sākuma uzstādīšana
@@ -23,188 +22,188 @@ class Alganators(): # Definē klasi Alganators
         self.APGADAJAMO_LIKME = 250 # Likme par katru apgādājamo personu 250 eiro
         self.ALGAS_LIKME = 1667 # Likme pēc kuras pienākas papildus nodoklis
 
-        self.darbinieks_vards = darbinieks_vards # Vienkārši definē tukšu mainīgo
-        self.darbinieks_uzvards = darbinieks_uzvards # Vienkārši definē tukšu mainīgo
-        self.darbinieks_pk = darbinieks_pk # Vienkārši definē tukšu mainīgo
-        self.darbinieks_alga = float(darbinieks_alga) # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_alga"
-        self.darbinieks_berni = int(darbinieks_berni) # definē mainīgo, kura vērtība tiek pielīdzināta objekta ievadītiem datiem "darbinieks_berni"
-        self.darba_devejs_vards = darba_devejs_vards # Vienkārši definē tukšu mainīgo
-        self.darba_devejs_uzvards = darba_devejs_uzvards # Vienkārši definē tukšu mainīgo
-        self.uznemums = uznemums # Vienkārši definē tukšu mainīgo
+        self.darbinieks_vards = darbinieks_vards # Pielīdzina klases mainīgo ievadītajam parametram
+        self.darbinieks_uzvards = darbinieks_uzvards # Pielīdzina klases mainīgo ievadītajam parametram
+        self.darbinieks_pk = darbinieks_pk # Pielīdzina klases mainīgo ievadītajam parametram
+        self.darbinieks_alga = float(darbinieks_alga) # definē mainīgo, kura vērtība tiek pielīdzināta objektā ievadītam parametram "darbinieks_alga"
+        self.darbinieks_berni = int(darbinieks_berni) # definē mainīgo, kura vērtība tiek pielīdzināta objektā ievadītam parametram "darbinieks_berni"
+        self.darba_devejs_vards = darba_devejs_vards # Pielīdzina klases mainīgo ievadītajam parametram
+        self.darba_devejs_uzvards = darba_devejs_uzvards # Pielīdzina klases mainīgo ievadītajam parametram
+        self.uznemums = uznemums # Pielīdzina klases mainīgo ievadītajam parametram
 
         self.data = {"Darbinieks": {"Vards":darbinieks_vards,"Uzvards":darbinieks_uzvards,"Personas_kods":darbinieks_pk,"Berni":darbinieks_berni,"Alga":darbinieks_alga},"darba_Devejs":{"Vards":darba_devejs_vards,"Uzvards":darba_devejs_uzvards},"Uznemums":uznemums} # vārdnīcas izveide, kurā tiks glabāti ievadītie dati
 
         self.db = mysql.connector.connect(host="localhost",database="algaprekins",user="root",password="password") # Programma tiek savienota ar datu bāzi, kuras nosaukums ir "algaprekins"
         self.cursor = self.db.cursor() # Kursora definēšana, ar kura palīdzību var pārvietoties pa datu bāzi
 
-        self.veids = ["darbinieks","darba_devejs","alga"]
-        self.db_dati = {"darbinieks":[],"darba_devejs":[],"alga":[]}
+        self.veids = ["darbinieks","darba_devejs","alga"] # saraksta izveide, kurā tiek glabāti MySQL tabulu nosaukumi, ērtai piekļuvei
+        self.db_dati = {"darbinieks":[],"darba_devejs":[],"alga":[]} # Vārdnīcas izveide, kas glabās sevī datus no katras MySQL tabulas
         
-        for v in self.veids:
-            self.cursor.execute(f"SELECT * FROM {v}")
-            self.db_dati[v] = self.cursor.fetchall()
+        for v in self.veids: # For cikla izveide, kura iterēs cauri "self.veids" vārdnīcai pielīdzinot datus mainīgajam "v"
+            self.cursor.execute(f"SELECT * FROM {v}") # datu bāzes kursors izpilda komandu "SELECT * FROM {v}", kas nozīmē atlasīt VISUS datus no v, jeb no tabulām - "darbinieks", "darba_devejs" un "alga"
+            self.db_dati[v] = self.cursor.fetchall() # iepriekš atlasītos datus ievieto "self.db_dati" vārdnīcā pie "v" atslēgas
 
     def algas_formula(self): # Definēta funkcija, kura saņems 2 datus, bruto algu un bērnu skaitu
         atvieglojums = self.darbinieks_berni * self.APGADAJAMO_LIKME # atvieglojuma aprēķināšana (bērnu skaits pareizināts ar likmi, kura ir 250 eiro par vienu bērnu)
         if self.darbinieks_alga <= self.ALGAS_LIKME: # Pārbauda, vai bruto alga nav lielāka par algas likmi, kura ir 1667 eiro
             sn = self.darbinieks_alga * self.SN_LIKME # 1. darbība ir sociālā nodokļa aprēķins (bruto alga pareizināta ar sociālā nodokļa likmi (10.5%))
             iin_baze = self.darbinieks_alga - sn - atvieglojums # 2. IIN (iedzīvotāja ienākuma nodokļa) bāzes aprēķināšana (no bruto algas tiek atņemts sociālais nodoklis un atvieglojums)
-            if iin_baze > 0:
-                pass
-            else:
-                iin_baze = 0
+            if iin_baze > 0: # ja mainīgā iin_baze vērtība ir lielāka par nulli
+                pass # neko nedara, vienkārši izlaiž šo rindiņu un iziet no if nosacījumiem
+            else: # citādi
+                iin_baze = 0 # pielīdzina mainīgo iin_baze nullei, sakarā ar to, ka iin_bāze nevar būt negatīva. (citādi darbiniekam no algas, kurai jābūt 700, viņa var izaugt līdz 1000 un tas nav iespējams dzīvē, jo sanāks ka valsts viņam vēl parādā būs +300 eiro)
             iin = iin_baze * self.IIN_LIKME # 3. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, IIN bāze tiek pareizināta ar IIN likmi, kura ir 20%
             neto_alga = self.darbinieks_alga - sn - iin # 4. Neto algas (tīrās algas) aprēķināšana, no bruto algas tiek atņemti visi nodokļi (sociālais nodoklis un iedzīvotāja ienākuma nodoklis)
             return neto_alga # Atgriež neto algas vērtību
         else: # Ja bruto alga ir lielāka par algas likmi, kura ir 1667 eiro, tad:
             sn = self.darbinieks_alga * self.SN_LIKME # 1. sociālā nodokļa aprēķināšana (bruto alga pareizināta ar sociālā nodokļa likmi (10.5%))
             iin_baze = self.ALGAS_LIKME - sn - atvieglojums # 2. IIN (iedzīvotāja ienākuma nodokļa) bāzes aprēķināšana (no algas likmes (1667 eiro) tiek atņemts sociālais nodoklis un atvieglojums)
-            if iin_baze > 0:
-                pass
-            else:
-                iin_baze = 0
+            if iin_baze > 0: # ja mainīgā iin_baze vērtība ir lielāka par nulli
+                pass # neko nedara, vienkārši izlaiž šo rindiņu un iziet no if nosacījumiem
+            else: # citādi
+                iin_baze = 0 # pielīdzina mainīgo iin_baze nullei, sakarā ar to, ka iin_bāze nevar būt negatīva. (citādi darbiniekam no algas, kurai jābūt 700, viņa var izaugt līdz 1000 un tas nav iespējams dzīvē, jo sanāks ka valsts viņam vēl parādā būs +300 eiro)
             iin = iin_baze * self.IIN_LIKME # 3. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, IIN bāze tiek pareizināta ar IIN likmi, kura ir 20%
             parpalikums = self.darbinieks_alga - self.ALGAS_LIKME # 4. Pārpalikuma aprēķināšana, kuru var izrēķināt, atņemot algas likmi (1667) no bruto algas
             iin2 = parpalikums * self.IIN_LIKME2 # 5. IIN (iedzīvotāja ienākuma nodokļa) aprēķināšana, šoreiz pareizinot pārpalikumu ar IIN likmi, kad bruto alga pārsniedz 1667 eiro, tas ir 23%
             neto_alga = self.darbinieks_alga - sn - iin - iin2 # 6. Neto algas (tīrās algas) aprēķināšana, no bruto algas tiek atņemti visi nodokļi (sociālais nodoklis un iedzīvotāja ienākuma nodokļi)
             return neto_alga # Atgriež neto algas vērtību
     
-    def index_parbaude(self,idx):
-        if idx == None or idx == []:
-            idx = 0
-        elif idx != None:
-            idx = int(idx[-1][0]) + 1
-        return idx
+    def index_parbaude(self,idx): # definē metodi "index_parbaude", kas saņems parametru "self", jo tā ir savas klases "Alganators" metode, un "idx", kas nākotnē kļūs par indeksa mainīgo
+        if idx == None or idx == []: # Pārbauda vai indekss ir nekas (None), vai tukšs saraksts ([])
+            idx = 0 # Šādā situācijā pielīdzina indeksu nullei
+        elif idx != None: # citādi, ja indekss tomēr nav nekas (None)
+            idx = int(idx[-1][0]) + 1 # Tad pielīdzināt mainīgo "idx" - pēdājai pirmajai indeksa vērtībai pārveidotai par cipariem, sakarā ar to, ka idx vērtība šobrīd ir vienas rindas saraksts no visiem MySQL tabulu sarakstiem, jeb tur ir vairāki saraksti, kuri izskatās aptuveni šādi [ [0,'vards','uzvards','bla-bla'], [0,'alga','nauda','banknotes'], [0,'sia logi',1024,0,0] ] un tiek ņemts pēdējā iekšējā sarakta pirmais, jeb 0 elements, kurš parasti ir (un arī tālāk būs) datu indekss (P.S. es nemāku paskaidrot..)
+        return idx # atgriež mainīgo "idx"
     
-    def pieskir_index(self,struktura,indeksi):
-        for i in struktura:
-            i.insert(0,indeksi[struktura.index(i)])
-            if i == struktura[2]:
-                i.insert(3,indeksi[0])
-                i.insert(4,indeksi[1])
-        return struktura
+    def pieskir_index(self,struktura,indeksi): # definē citu metodi "pieskir_index", kura saņems prametrus "self","struktura" un "indeksi"
+        for i in struktura: # Ar for cikla palīdzību notiks iterācija cauri saraksta "struktura" elementiem, kurš sastāv no citiem sarakstiem
+            i.insert(0,indeksi[struktura.index(i)]) # katrā saraksta "struktura" iekšējā sarakstā ievieto indeksu, kurš izvilkts no cita indeksa, no saraksta "sturktura" no saraksta "indeksi", pašā sākumā, jeb pirms 0. elementa (P.S. es tiešām nevaru izskaidrot.)
+            if i == struktura[2]: # Pārbauda vai "struktura" saraksta elements, jeb for cikla mainīgais "i" ir vienāds ar trešo (skaitot no viens) "struktura" saraksta elementu
+                i.insert(3,indeksi[0]) # ievieto šajā, mainīgā "i", sarakstā indeksu no 0. "indeksi" saraksta elementa pirms 3. mainīgā "i" saraksta elementa (saraksts "struktura" sastāv no citiem sarakstiem)
+                i.insert(4,indeksi[1]) # ievieto šajā, mainīgā "i", sarakstā indeksu no 1. "indeksi" saraksta elementa pirms 4. mainīgā "i" saraksta elementa (saraksts "struktura" sastāv no citiem sarakstiem)
+        return struktura # atgriež sarakstu "struktura"
     
-    def datu_parbaude(self,data):
-        count = 0
-        for v in self.veids:
-            self.cursor.execute(f"SELECT * FROM {v}")
-            self.db_dati[v] = self.cursor.fetchall()
-        sakritosie_dati = {"darbinieks":[False,0,False],"darba_devejs":[False,0],"alga":[False,0]}
-        for v in self.db_dati:
-            if self.db_dati[v] != []:
-                for i in self.db_dati[v]:
-                    for j in i:
-                        if v == "darbinieks":
-                            if i.index(j) == 1 or i.index(j) == 2 or i.index(j) == 3:
-                                if j == data[count][i.index(j)]:
-                                    sakritosie_dati["darbinieks"][1]+=1
-                                    if i.index(j) == 3:
-                                        sakritosie_dati["darbinieks"][2] = True
-                        elif v == "darba_devejs":
-                            if i.index(j) == 1 or i.index(j) == 2:
-                                if j == data[count][i.index(j)]:
-                                    sakritosie_dati["darba_devejs"][1]+=1
-                        else:
-                            if i.index(j) == 1:
-                                if j == data[count][i.index(j)]:
-                                    sakritosie_dati["alga"][1]+=1
-            count+=1
-        for i in sakritosie_dati:
-            if i == "darba_devejs":
-                if sakritosie_dati[i][1] == 1:
-                    sakritosie_dati[i][0] = True
-                    return sakritosie_dati[i][0]
-            elif i == "darbinieks":
-                if sakritosie_dati[i][2]:
-                    if sakritosie_dati[i][1] >= 1:
-                        sakritosie_dati[i][0] = True
-                        return sakritosie_dati[i][0]
+    def datu_parbaude(self,data): # definē metodi "datu_parbaude", kura saņems prametrus "self" un "data"
+        count = 0 # mainīgais, lai sekot līdzi iterāciju skaitam
+        for v in self.veids: # for cikla iterācija cauri "self.veids" sarakstam
+            self.cursor.execute(f"SELECT * FROM {v}") # atlasa VISU no "v" mainīgā, jeb mysql tabulu nosaukumiem, sakarā ar to, ka "self.veids" saraksts glabāja sevī mysql tabulu nosaukumus
+            self.db_dati[v] = self.cursor.fetchall() # ievieto "self.db_dati" vārdnīcā pie [v] atslēgas (jeb "darbinieks","darba_devejs", "alga") augstāk atlasītos datus
+        sakritosie_dati = {"darbinieks":[False,0,False],"darba_devejs":[False,0],"alga":[False,0]} # sakrītošo datu vārdnīcas izveide
+        for v in self.db_dati: # iterācija cauri "self.db_dati" vārdnīcai, jeb izvelk šīs vārdnīcas atslēgas
+            if self.db_dati[v] != []: # Pārbauda vai "self.db_dati" vārdnīcas saraksts pie [v] atslēgas nav tukšs.
+                for i in self.db_dati[v]: # iterē cauri datiem pie atslēgām. notiks 3 ārējās iterācijas, kurās notiks vēl iekšējās - angliski to sauc par "nested loops"
+                    for j in i: # iterē cauri elementiem, kurus ieguva no sarakstiem, kurus ieguva no "self.db_dati" vārdnīcas
+                        if v == "darbinieks": # skatās vai šīs iterācijas atslēgas nosaukums ir "darbinieks"
+                            if i.index(j) == 1 or i.index(j) == 2 or i.index(j) == 3: # Pārbauda vai saraksts, kuram iterē cauri atrodas uz viena no indeksiem
+                                if j == data[count][i.index(j)]: # ja datu bāzes datu vārdnīcas saraksta elements pie atslēgas "darbinieks" ir vienāds ar datiem, kuri tika ievadīti "data" sarakstā un pie šī paša elementa indeksa
+                                    sakritosie_dati["darbinieks"][1]+=1 # Palielina sakrītošo datu skaitu pie atslēgas "darbinieks" par vienu
+                                    if i.index(j) == 3: # Ja tiek iterēts cauri 3 elementam
+                                        sakritosie_dati["darbinieks"][2] = True # Apstiprina sakrītošos datus pie atslēgas "darbinieks" (šeit tika pārbaudīts, vai  ievadītais darbinieka personas kods sakrita ar jebkuru no personas kodiem datu bāzē, ja tā, tad to apstiprināja)
+                        elif v == "darba_devejs": # skatās vai šīs iterācijas atslēgas nosaukums ir "darba_devejs"
+                            if i.index(j) == 1 or i.index(j) == 2: # Pārbauda vai saraksts, kuram iterē cauri atrodas uz viena no indeksiem
+                                if j == data[count][i.index(j)]: # ja datu bāzes datu vārdnīcas saraksta elements pie atslēgas "darba_devejs" ir vienāds ar datiem, kuri tika ievadīti "data" sarakstā un pie šī paša elementa indeksa
+                                    sakritosie_dati["darba_devejs"][1]+=1 # Palielina sakrītošo datu skaitu pie atslēgas "darba_devejs" par vienu
+                        else: # skatās vai šīs iterācijas atslēgas nosaukums ir kāds cits, jeb "alga"
+                            if i.index(j) == 1: # Ja tiek iterēts cauri 3 elementam
+                                if j == data[count][i.index(j)]: # ja datu bāzes datu vārdnīcas saraksta elements pie atslēgas "alga" ir vienāds ar datiem, kuri tika ievadīti "data" sarakstā un pie šī paša elementa indeksa
+                                    sakritosie_dati["alga"][1]+=1 # Palielina sakrītošo datu skaitu pie atslēgas "alga" par vienu
+            count+=1 # palielina mainīgā vērtību, lai varētu sekot līdzi iterācijām
+        for i in sakritosie_dati: # iterācija cauri "sakritosie_dati" vārdnīcai, jeb izvelk šīs vārdnīcas atslēgas
+            if i == "darba_devejs": # skatās vai šīs iterācijas atslēgas nosaukums ir "darba_devejs"
+                if sakritosie_dati[i][1] == 1: # ja ir tieši vieni sakrītoši dati
+                    sakritosie_dati[i][0] = True # apstiprina to, padarot vienu vērtību pie šīs atslēgas par True
+                    return sakritosie_dati[i][0] # atgriež True
+            elif i == "darbinieks": # skatās vai šīs iterācijas atslēgas nosaukums ir "darbinieks"
+                if sakritosie_dati[i][2]: # Vispirms pārbauda vai "Personas Koda" vērtība pie darbinieka atslēgas saraksta ir patiesa (True)
+                    if sakritosie_dati[i][1] > 1: # ja ir vairāk par vienu sakrītošu datu
+                        sakritosie_dati[i][0] = True # apstiprina to, padarot vienu vērtību pie šīs atslēgas par True
+                        return sakritosie_dati[i][0] # atgriež True
                 else:
-                    if sakritosie_dati[i][1] >= 2:
-                        sakritosie_dati[i][0] = True
-                        return sakritosie_dati[i][0]
-            else:
-                if sakritosie_dati[i][1] == 1:
-                    sakritosie_dati[i][0] = True
-                    return sakritosie_dati[i][0]
-        return False
+                    if sakritosie_dati[i][1] >= 2: # ja ir divi vai vairāk sakrītošu datu
+                        sakritosie_dati[i][0] = True  # apstiprina to, padarot vienu vērtību pie šīs atslēgas par True
+                        return sakritosie_dati[i][0] # atgriež True
+            else: # citādi (ja atslēga ir "alga")
+                if sakritosie_dati[i][1] == 1: # ja ir tieši vieni sakrītoši dati
+                    sakritosie_dati[i][0] = True # apstiprina to, padarot vienu vērtību pie šīs atslēgas par True
+                    return sakritosie_dati[i][0] # atgriež True
+        return False # ja nevieni dati nesakrita atgriež False
 
-    def saglabasana(self):
-        alga_data_structure = [self.data["Uznemums"],self.algas_formula()]
-        darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]]
-        darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]]
+    def saglabasana(self): # definē metodi "saglabasana", kura saņems prametru "self"
+        alga_data_structure = [self.data["Uznemums"],self.algas_formula()] # algas datu struktūras izveide (tā ir struktūra, pēc kuras tiks saglabāti dati MySQL datu bāzes tabulā "alga")
+        darbinieks_data_structure = [self.data["Darbinieks"]["Vards"],self.data["Darbinieks"]["Uzvards"],self.data["Darbinieks"]["Personas_kods"],self.data["Darbinieks"]["Berni"],self.data["Darbinieks"]["Alga"]] # Darbinieka datu struktūras izveide (tā ir struktūra, pēc kuras tiks saglabāti dati MySQL datu bāzes tabulā "darbinieks")
+        darba_devejs_data_structure = [self.data["darba_Devejs"]["Vards"],self.data["darba_Devejs"]["Uzvards"]] # darba devēja datu struktūras izveide (tā ir struktūra, pēc kuras tiks saglabāti dati MySQL datu bāzes tabulā "darba_devejs")
 
         sql = {
             "Darbinieks":("""insert into darbinieks (ID_darbinieks, darbinieks_vards, darbinieks_uzvards, darbinieks_pk, darbinieks_berni, darbinieks_alga) values (%s, %s, %s, %s,%s, %s);"""),
             "Darba Devejs":("""insert into darba_devejs (ID_darba_devejs, darba_devejs_vards, darba_devejs_uzvards) values (%s,%s, %s);"""),
             "Alga":("""insert into alga (ID_alga, uznemums, neto_alga, darbinieks_ID, darba_devejs_ID) values (%s, %s, %s, %s,%s);""")
             }
+        # 4 augšējās rindiņās tika izveidots tā saucamais "query", jeb pieprasījums sql datu bāzei vai kam citam, īsumā - sql pieprasījuma izveide katrai tabulai, tāpēc viss ir tik ērti, smuki, kompakti sakārtots vienā vārdnīcā
 
-        indeksi = []
+        indeksi = [] # tukša indeksu saraksta izveide
 
-        for v in self.veids:
-            self.cursor.execute(f"SELECT * FROM {v}")
-            indeksi.append(self.index_parbaude(self.cursor.fetchall()))
+        for v in self.veids: # for cikla iterācija cauri "self.veids" sarakstam
+            self.cursor.execute(f"SELECT * FROM {v}") # atlasa VISU no "v" mainīgā, jeb mysql tabulu nosaukumiem, sakarā ar to, ka "self.veids" saraksts glabāja sevī mysql tabulu nosaukumus
+            indeksi.append(self.index_parbaude(self.cursor.fetchall())) # pievieno visus atlasītos datus, kurus pirms tam pārbauda, izmantojot metodi "self.index_parbaude", indeksu sarakstam
 
-        structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure,]
-        structures = self.pieskir_index(structures,indeksi)
-        parbaude = self.datu_parbaude(structures)
-        count=0
-        if not parbaude:
-            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt"):
-                savingData = f"\n-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n"
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8")
-                f.write(savingData)
-                f.close()
-            else:
-                savingData = f"-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n"
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8")
-                f.write(savingData)
-                f.close()
-            count = 0
-            for i in sql:
-                self.cursor.execute(sql[i],structures[count])
-                self.db.commit()
-                count += 1
-            return True
-        else:
-            return False
+        structures = [darbinieks_data_structure,darba_devejs_data_structure,alga_data_structure] # apvieno visus struktūru sarakstus vienā, kopīgā sarakstā "structures"
+        structures = self.pieskir_index(structures,indeksi) # pielīdzina structures mainīgā vērtību - metodes "pieskir_index" atgrieztajiem datiem
+        parbaude = self.datu_parbaude(structures) # izveido mainīgo "parbaude", lai pārbaudīt "structures" sarakstā esošo sarakstu datu unikalitāti
+        if not parbaude: # pārbaudes laikā netika atrasti dati, kas atkārtojas
+            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt"): # pārbauda vai šajā ceļā atrodas sekojošais fails
+                savingData = f"\n-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8") # atver failu sekojošajā ceļā pievienošanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
+                f.close() # pēc darba aizver failu
+            else: # ja šajā ceļā NEatrodas šāds fails
+                savingData = f"-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
+                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8") # atver failu sekojošajā ceļā rakstīšanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
+                f.close() # pēc darba aizver failu
+            count=0 # mainīgais, lai sekot līdzi iterāciju skaitam
+            for i in sql: # iterācija, izmantojot for ciklu cauri "sql" vārdnīcas atslēgām
+                self.cursor.execute(sql[i],structures[count]) # datu bāzes kursors izpilda katru vaicājumu, kuri tika ierakstīti "sql" vārdnīcā pie katras atslēgas, kurā ievieto datus no "structures" saraksta pie elementa, kurš atbilst iterāciju skaitam
+                self.db.commit() # apstiprina pieprasījumu datu bāzei
+                count += 1 # palielina izpildīto iterāciju skaitu
+            return True # atgriež True, ja dati tika veiksmīgi saglabāti
+        else: # citādi
+            return False # atgriež False, ja dati netika veiksmīgi saglabāti
         
-    def db_upd(self):
-        for v in self.veids:
-            self.cursor.execute(f"SELECT * FROM {v}")
-            self.db_dati[v] = self.cursor.fetchall()
+    def db_upd(self): # definē metodi "db_upd", kura saņems prametru "self"
+        for v in self.veids: # iterācija cauri "self.veids" vārdnīcas atslēgām
+            self.cursor.execute(f"SELECT * FROM {v}") # atlasa VISU no "v" mainīgā, jeb mysql tabulu nosaukumiem, sakarā ar to, ka "self.veids" saraksts glabāja sevī mysql tabulu nosaukumus
+            self.db_dati[v] = self.cursor.fetchall() # iepriekš atlasītos datus ievieto "self.db_dati" vārdnīcā pie "v" atslēgas
     
-    def db_dati_return(self):
-        self.db_upd()
-        return self.db_dati
+    def db_dati_return(self): # definē metodi "db_dati_return", kura saņems prametru "self"
+        self.db_upd() # izsauc metodi datu "atsvaidzināšanai"
+        return self.db_dati # atgriež "atsvaidzinātos" datus
     
-    def editDb(self,sql):
-        self.db_upd()
-        self.cursor.execute(sql)
-        self.db.commit()
+    def editDb(self,sql): # definē metodi "editDb", kura saņems prametru "self" un "sql"
+        self.db_upd() # izsauc metodi datu "atsvaidzināšanai"
+        self.cursor.execute(sql) # izpilda datu rediģēšanu pēc parametra "sql" pieprasījuma
+        self.db.commit() # apstiprina izmaiņas datu bāzē
             
 
-def mainApp():
-    customtkinter.set_appearance_mode("System")
-    customtkinter.set_default_color_theme("blue")
+def mainApp(): # definē funkciju "mainApp"
+    customtkinter.set_appearance_mode("System") # uzstāda galveno aplikācijas tēmu (melno,balto vai sistēmas - tāda, kāda stāv lietotājam uz šo brīdi)
+    customtkinter.set_default_color_theme("blue") # uzstāda galveno krāsu aplikācijai
 
-    root = customtkinter.CTk()
-    root.geometry("500x350")
-    root.title("Algas aprēķina programma")
-    root.resizable(False,False)
-    root.grid_columnconfigure((0,1),weight=1)
-    root.grid_rowconfigure(0,weight=1)
+    root = customtkinter.CTk() # izveido galveno logu, jeb sakni
+    root.geometry("500x350") # uzstāda loga izmērus
+    root.title("Algas aprēķina programma") # uzstāda loga nosaukumu
+    root.resizable(False,False) # aizliedz mainīt loga izmēru
+    root.grid_columnconfigure((0,1),weight=1) # neesmu pārliecināts, bet varētu būt, ka konfigurē kolonnu elementu izkārtojumu, to svaru
+    root.grid_rowconfigure(0,weight=1) # neesmu pārliecināts, bet varētu būt, ka konfigurē rindu elementu izkārtojumu, to svaru
 
-    def errorFrame(text):
-        frame = customtkinter.CTkToplevel(master=root)
-        frame.geometry("1000x200")
-        frame.resizable(False,False)
-        frame.title("Uzmanību!")
-        frame.attributes('-topmost', 'true')
+    def errorFrame(text): # funkcijas "errorFrame" izveide, kura pieņem parametru "text"
+        frame = customtkinter.CTkToplevel(master=root) # uznirstošā lodziņa izveide
+        frame.geometry("1000x200") # uzstāda loga izmērus
+        frame.resizable(False,False) # aizliedz mainīt loga izmēru
+        frame.title("Uzmanību!") # uzstāda loga nosaukumu
+        frame.attributes('-topmost', 'true') # liek lodziņam parādīties virspusē, virs pārējiem logiem
 
-        errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center")
-        errorMSG.pack(padx=50, pady=50)
+        errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center") # teksta elementa izveide
+        errorMSG.pack(padx=50, pady=50) # teksta elementa izvietošana lodziņā
 
     def editFrame(dbDati):
         frame = customtkinter.CTkFrame(master=root)
@@ -361,8 +360,6 @@ def mainApp():
                             return False
 
                 tableNames = {"darbinieks":{"Vārds":"darbinieks_vards","Uzvārds":"darbinieks_uzvards","Personas Kods":"darbinieks_pk","Bērnu Skaits":"darbinieks_berni","Bruto Alga":"darbinieks_alga"},"darba_devejs":{"Vārds":"darba_devejs_vards","Uzvārds":"darba_devejs_uzvards"},"alga":{"Uzņēmums":"uznemums","Neto Alga":"neto_alga"}}
-                # sqlInsert = f"""UPDATE {tableNames[option][optionOption]} SET  = {entryData} WHERE {tableNames[option][optionOption]} = {data[valIdx[option][optionOption]]}"""
-                # sqlInsert = (option,tableNames[option][optionOption],{entryData},option,data[0])
                 sqlQuery = ("UPDATE %s SET %s = '%s' WHERE ID_%s ='%s' " % (option,tableNames[option][optionOption],entryData,option,data[0]))
                 Alganators(0,0,0,0,0,0,0,0).editDb(sqlQuery)
 
@@ -559,8 +556,8 @@ def mainApp():
         guestButton = customtkinter.CTkButton(master=loginframe, text="Viesa režīms", command=guest)
         guestButton.pack(pady=12,padx=10)
 
-    loginFrame()
+    loginFrame() # izsauc funkciju "loginFrame"
 
-    root.mainloop()
+    root.mainloop() # uzsāk galveno ciklu. nezinu ko tas dara, bet domāju, ka ar šī cikla palīdzību notiek aplikācijas darbināšana, cikls maina kadrus.
 
-mainApp()
+mainApp() # izsauc "mainApp" funkciju, jeb startē aplikāciju! :)
