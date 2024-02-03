@@ -4,7 +4,7 @@
 import os # Sistēmas bibliotēka, ar kuras palīdzību šajā programmā tiks pārbaudīta faila esamība
 import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.connector", kura nodrošinās iespēju savienoties ar datu bāzi
 import customtkinter # Lietotāja ievades bibliotēka, ērta bibliotēka moderna lietotāja interfeisa izveidei
-import pyotp # "Python one-time password" bibliotēka", jeb bibliotēka pagaidu paroļu izveidei
+import pyotp # "Python one-time password" bibliotēka, jeb bibliotēka pagaidu paroļu izveidei
 import qrcode # Šī bibliotēka tika izmantota vienu reizi, lai izveidot qr kodu, ar kura palīdzību varēja savienot pyotp ar mobilo autentifikatoru, jeb laika paroļu ģeneratoru
 
 key = 'XGT2BDNVJBTU2JFQCRAVCQPYNFZI2RVI' # base32 atslēgas izveide pyotp bibliotēkai
