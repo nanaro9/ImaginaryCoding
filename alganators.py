@@ -205,158 +205,157 @@ def mainApp(): # definē funkciju "mainApp"
         errorMSG = customtkinter.CTkLabel(master=frame, text=(f"Uzmanību! {text}"), font=("Roboto",32), anchor="center") # teksta elementa izveide
         errorMSG.pack(padx=50, pady=50) # teksta elementa izvietošana lodziņā
 
-    def editFrame(dbDati):
-        frame = customtkinter.CTkFrame(master=root)
-        frame.pack(pady=10, padx=20, fill="both", expand=True)
+    def editFrame(dbDati): # funkcijas "editFrame" izveide, kura pieņem parametru "dbDati"
+        frame = customtkinter.CTkFrame(master=root) # rāmja izveide galvenajā logā
+        frame.pack(pady=10, padx=20, fill="both", expand=True) # rāmja "pakošana"
 
-        label = customtkinter.CTkLabel(master=frame, text="Speciālais datu piekļuves centrs", font=("Roboto",22))
-        label.pack(pady=12,padx=10)
+        label = customtkinter.CTkLabel(master=frame, text="Speciālais datu piekļuves centrs", font=("Roboto",22)) # teksta elementa izveide
+        label.pack(pady=12,padx=10) # teksta elementa izvietošana lodziņā
 
-        entry = customtkinter.CTkEntry(master=frame, placeholder_text="Ievadiet meklējamā informāciju...")
-        entry.pack(pady=12,padx=10)
+        entry = customtkinter.CTkEntry(master=frame, placeholder_text="Ievadiet meklējamā informāciju...") # teksta ievades elementa izveide
+        entry.pack(pady=12,padx=10) # teksta ievades elementa izvietošana lodziņā
 
-        optionmenu = customtkinter.CTkOptionMenu(frame, values=["Darbinieks", "Darba Devējs", "Alga"])
-        optionmenu.pack(pady=12,padx=10)
+        optionmenu = customtkinter.CTkOptionMenu(frame, values=["Darbinieks", "Darba Devējs", "Alga"]) # Izvēles elementa izveide
+        optionmenu.pack(pady=12,padx=10) # izvēles elementa izvietošana lodziņā
 
-        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"ID"))
-        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"PK"))
+        ID_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc ID",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"ID")) # pogas izveide meklēšanai pēc ID, kura pēc uzspiešanas izsauc funkciju "searchResults", kura pieņem ievades un izvēles elementu izvēli un "ID" identifikatoru
+        PK_searchButton = customtkinter.CTkButton(master=frame,text="Meklēt pēc personas koda",font=("Roboto",14),command=lambda: searchResults(entry.get(),optionmenu.get(),"PK")) # pogas izveide meklēšanai pēc PK, kura pēc uzspiešanas izsauc funkciju "searchResults", kura pieņem ievades un izvēles elementu izvēli un "PK" identifikatoru
 
-        ID_searchButton.pack(pady=12)
-        PK_searchButton.pack(pady=12)
+        ID_searchButton.pack(pady=12) # meklēšanas podziņas izvietošana lodziņā
+        PK_searchButton.pack(pady=12) # meklēšanas podziņas izvietošana lodziņā
 
-        def searchResults(searchInfo,optionChoice,searchMode):
-            dbDati = Alganators(0,0,0,0,0,0,0,0).db_dati_return()
-            options = ["darbinieks","darba_devejs","alga"]
+        def searchResults(searchInfo,optionChoice,searchMode): # funkcijas "searchResults" izveide, kura pieņem parametru "searchInfo,optionChoice,searchMode"
+            dbDati = Alganators(0,0,0,0,0,0,0,0).db_dati_return() # dbDati mainīgā atkārtota izveide, kas izsauc klases "Alganators" "db_dati_return" metodi, atgriežot datu bāzē esošos datus
+            options = ["darbinieks","darba_devejs","alga"] # mainīgā "options" izveide, kurā glabāsies visi iespējamie izvēles varianti meklēšanai
 
-            if optionChoice == "Darbinieks":
-                optionChoice = options[0]
-            elif optionChoice == "Darba Devējs":
-                optionChoice = options[1]
-            else:
-                optionChoice = options[2]
+            if optionChoice == "Darbinieks": # Pārbauda vai izvēles variants ir "Darbinieks"
+                optionChoice = options[0] # piešķir mainīgajam "optionChoice" "options" saraksta pirmo elementu
+            elif optionChoice == "Darba Devējs": # Pārbauda vai izvēles variants ir "Darba Devējs"
+                optionChoice = options[1] # piešķir mainīgajam "optionChoice" "options" saraksta otro elementu
+            else: # citādi
+                optionChoice = options[2] # piešķir mainīgajam "optionChoice" "options" saraksta trešo elementu
 
-            if searchMode == "ID":
-                if searchInfo.isdigit():
-                    found = False
-                    for i in dbDati[optionChoice]:
-                        if int(searchInfo) == i[0]:
-                            found = True
-                            editFrame([optionChoice,i])
-                    if not found:
-                        errorFrame("Dati ar šādu ID neeksistē!")
-                else:
-                    errorFrame("Nepareizi ievadīts ID")
-            elif searchMode == "PK":
-                if optionChoice == "darbinieks":
-                    found = False
-                    for i in dbDati[optionChoice]:
-                        if searchInfo == i[3]:
-                            found = True
-                            editFrame([optionChoice,i])
-                    if not found:
-                        errorFrame("Datu ar šādu Personas kodu neeksistē!")
-                else:
-                    errorFrame("Meklēšana TIKAI DARBINIEKA DATIEM!")
-
-
-        def datu_parbaude(data):
-            count = 0
-            sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]}
-            # print(dbDati,data)
-
-        def editFrame(EditData):
-            frame = customtkinter.CTkToplevel(master=root)
-            frame.geometry("700x450")
-            frame.resizable(False,False)
-            frame.title("Algas aprēķina programma")
-            frame.attributes('-topmost', 'true')
-
-            innerFrame = customtkinter.CTkFrame(master=frame)
-            innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
-
-            label = customtkinter.CTkLabel(master=innerFrame, text="Datu Rediģēšana", font=("Roboto",22))
-            label.pack(pady=12)
+            if searchMode == "ID": # Ja mainīgais "searchMode" atbilst vērtībai "ID"
+                if searchInfo.isdigit(): # pārbauda vai mainīgais "searchInfo" satur ciparus
+                    found = False # izveido mainīgo "found", kura vērtība ir False, jeb nepatiess
+                    for i in dbDati[optionChoice]: # iterācija cauri datu bāzes vārdnīcas datiem, pie atslēgas "optionChoice", jeb viens no trijiem variantiem: "darbinieks";"darba_devejs";"alga"
+                        if int(searchInfo) == i[0]: # pārbauda vai pirmais iterācijas elements atbilst meklētajam "ID"
+                            found = True # sakritības gadījumā pārveido mainīgo "found" par True, jeb patiesu
+                            editFrame([optionChoice,i]) # izsauc funkciju "editFrame", kurā pārnes parametrus "optionChoice" un "i", jeb tekošās iterācijas elementu no datu bāzes, kas ir saraksts
+                    if not found: # pārbauda, ja tomēr mainīgā "found" vērtība netika mainīta
+                        errorFrame("Dati ar šādu ID neeksistē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                else: # pārbauda vai mainīgais "searchInfo" nesatur ciparus 
+                    errorFrame("Nepareizi ievadīts ID") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+            elif searchMode == "PK": # Ja mainīgais "searchMode" atbilst vērtībai "PK"
+                if optionChoice == "darbinieks": # Pārbauda vai izvēles variants ir "darbinieks"
+                    found = False # izveido mainīgo "found", kura vērtība ir False, jeb nepatiess
+                    for i in dbDati[optionChoice]: # iterācija cauri datu bāzes vārdnīcas datiem, pie atslēgas "optionChoice", jeb viens no trijiem variantiem: "darbinieks";"darba_devejs";"alga"
+                        if searchInfo == i[3]: # pārbauda vai ceturtais iterācijas elements atbilst meklētajam "ID"
+                            found = True # sakritības gadījumā pārveido mainīgo "found" par True, jeb patiesu
+                            editFrame([optionChoice,i]) # izsauc funkciju "editFrame", kurā pārnes parametrus "optionChoice" un "i", jeb tekošās iterācijas elementu no datu bāzes, kas ir saraksts
+                    if not found: # pārbauda, ja tomēr mainīgā "found" vērtība netika mainīta
+                        errorFrame("Datu ar šādu Personas kodu neeksistē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                else: # ja mainīgais "optionChoice" nav "darbinieks"
+                    errorFrame("Meklēšana TIKAI DARBINIEKA DATIEM!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
 
 
-            optionList = {"darbinieks":["Vārds","Uzvārds","Personas Kods","Bērnu Skaits","Bruto Alga"],"darba_devejs":["Vārds","Uzvārds"],"alga":["Uzņēmums","Neto Alga"]}
+        def datu_parbaude(data): # definē funkciju "datu_parbaude", kura saņems parametru "data"
+            count = 0 # definē mainīgo iterāciju skaita sekošanai
+            sakritosie_dati = {"darbinieks":[False,0],"darba_devejs":[False,0],"alga":[False,0]} # izveido vārdnīcu, kuros tiks glabāti sakrītošo datu esamība un to skaits
 
-            idx = 0
-            for v in EditData[1][1:]:
-                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[EditData[0]][idx]}: {str(v)}", font=("Roboto",18))
-                dataLabel.pack(pady=12)
-                idx+=1
+        def editFrame(EditData): # definē funkciju "editFrame", kas pieņems parametru "EditData"
+            frame = customtkinter.CTkToplevel(master=root) # iznirstošā rāmja izveide galvenajā logā
+            frame.geometry("700x450") # rāmja izmēra maiņa
+            frame.resizable(False,False) # rāmja izmēru lietotājs mainīt nevarēs
+            frame.title("Algas aprēķina programma") # rāmja nosaukuma maiņa
+            frame.attributes('-topmost', 'true') # rāmja izvietošana pa priekšu citiem logiem
 
-            optionmenu = customtkinter.CTkOptionMenu(frame, values=optionList[EditData[0]])
-            optionmenu.pack(pady=12)
+            innerFrame = customtkinter.CTkFrame(master=frame) # iekšējā rāmja izveide
+            innerFrame.pack(pady=10, padx=20, fill="both", expand=True) # iekšējā rāmja izvietošana un konfigurēšana
 
-            EditBtn = customtkinter.CTkButton(master=frame,text="Rediģēt Izvēlētos Datus",font=("Roboto",14),command=lambda: popupEdit(optionmenu.get(),EditData))
-            EditBtn.pack(pady=12)
+            label = customtkinter.CTkLabel(master=innerFrame, text="Datu Rediģēšana", font=("Roboto",22)) # teksta elementa izveide
+            label.pack(pady=12) # teksta elementa izvietošana
 
-            def destroyEditFrameContents():
-                for f in innerFrame.winfo_children():
-                    f.destroy()
-                optionmenu.destroy()
-                EditBtn.destroy()
 
-            def popupEdit(data_to_edit,editData):
-                destroyEditFrameContents()
+            optionList = {"darbinieks":["Vārds","Uzvārds","Personas Kods","Bērnu Skaits","Bruto Alga"],"darba_devejs":["Vārds","Uzvārds"],"alga":["Uzņēmums","Neto Alga"]} # vārdnīcas izveide ar datu bāzes tabulu atslēgām un aptuvenie tabulu datu kolonnu nosaukumi
 
-                label = customtkinter.CTkLabel(master=innerFrame, text=f"Datu Rediģēšana ({data_to_edit})", font=("Roboto",22))
-                label.pack(pady=12)
+            idx = 0 # mainīgā "idx" definēšana iterāciju skaita sekošana
+            for v in EditData[1][1:]: # iterācija cauri "EditData" sarakstam
+                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[EditData[0]][idx]}: {str(v)}", font=("Roboto",18)) # teksta elementa izveide, kam piešķir vēlamo rediģējamo datu nosaukumus un to vērtības
+                dataLabel.pack(pady=12) # izvieto datus uz ekrāna
+                idx+=1 # palielina "idx" mainīgā vērtību par vienu
 
-                entry = customtkinter.CTkEntry(master=innerFrame, placeholder_text="Ievadiet vērtību aizstāšanai",width=600)
-                entry.pack(pady=12)
+            optionmenu = customtkinter.CTkOptionMenu(frame, values=optionList[EditData[0]]) # "izvēlnes" izveide
+            optionmenu.pack(pady=12) # izvieto "izvēlnes" elementu uz lodziņa
 
-                btn = customtkinter.CTkButton(master=innerFrame, text="Rediģēt/Aizstāt",width=400,command=lambda:check(entry.get(),editData[1],editData[0],data_to_edit))
-                btn.pack(pady=12)
+            EditBtn = customtkinter.CTkButton(master=frame,text="Rediģēt Izvēlētos Datus",font=("Roboto",14),command=lambda: popupEdit(optionmenu.get(),EditData)) # izveido podziņu
+            EditBtn.pack(pady=12) # izvieto podziņu uz ekrāna
 
-            def check(entryData,data,option,optionOption):
-                if entryData == '':
-                    errorFrame(f"lauciņš palika tukšs!")
-                    return False
-                if optionOption == "Uzņēmums":
-                    if entryData.isdigit():
-                        errorFrame(f"lauciņš netika aizpildīts korekti!")
-                        return False
-                if option == "darbinieks" or option == "darba_devejs":
-                    if optionOption == "Vārds" or optionOption == "Uzvārds":
-                            if entryData.isdigit():
-                                errorFrame(f"lauciņš netika aizpildīts korekti!")
-                                return False
-                if optionOption == "Personas Kods":
-                    if len(entryData) < 12:
-                        errorFrame(f"lauciņš netika aizpildīts korekti!")
-                        return False
-                    if not entryData[:6].isdigit() or not entryData[7:].isdigit() or entryData[6] != "-":
-                        errorFrame(f"lauciņš netika aizpildīts korekti!")
-                        return False
-                if optionOption == "Bruto Alga" or optionOption == "Bērnu Skaits" or optionOption == "Neto Alga":
-                    if not entryData.isdigit():
-                        errorFrame(f"lauciņš netika aizpildīts korekti!")
-                        return False
+            def destroyEditFrameContents(): # definē funkciju "destroyEditFrameContents"
+                for f in innerFrame.winfo_children(): # iterācija cauri visiem rediģēšanas lodziņa elementiem
+                    f.destroy() # tekošās iterācijas elementu iznīcina, izposta, izārda un sagrauj 😡
+                optionmenu.destroy() # iznīcina "izvēlnes" elementu
+                EditBtn.destroy() # iznīcina podziņu
+
+            def popupEdit(data_to_edit,editData): # izveido funkciju "popupEdit" ar parametriem "data_to_edit" un "editData"
+                destroyEditFrameContents() # izsauc funkciju, kura iznīcina lodziņa elementus
+
+                label = customtkinter.CTkLabel(master=innerFrame, text=f"Datu Rediģēšana ({data_to_edit})", font=("Roboto",22)) # izveido teksta elementu
+                label.pack(pady=12) # izvieto teksta elementu
+
+                entry = customtkinter.CTkEntry(master=innerFrame, placeholder_text="Ievadiet vērtību aizstāšanai",width=600) # izveido ievades elementu
+                entry.pack(pady=12) # izvieto ievades elementu
+
+                btn = customtkinter.CTkButton(master=innerFrame, text="Rediģēt/Aizstāt",width=400,command=lambda:check(entry.get(),editData[1],editData[0],data_to_edit)) # izveido podziņu
+                btn.pack(pady=12) # izvieto podziņu lodziņā
+
+            def check(entryData,data,option,optionOption): # definē funkciju "check" ar parametriem "entryData", "data", "option", "optionOption"
+                if entryData == '': # pārbauda vai "entryData" mainīgā vērtība ir tukšs teksts
+                    errorFrame(f"lauciņš palika tukšs!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                    return False # atgriež False
+                if optionOption == "Uzņēmums": # pārbauda vai mainīgais "optionOption" ir "Uzņēmums"
+                    if entryData.isdigit(): # pārbauda vai "entryData" mainīgais satur ciparus
+                        errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                        return False # atgriež False
+                if option == "darbinieks" or option == "darba_devejs": # pārbauda vai mainīgā "option" vērtība ir "darbinieks" vai "darba_devejs"
+                    if optionOption == "Vārds" or optionOption == "Uzvārds": # pārbauda vai "optionOption" ir "Vārds" vai "Uzvārds"
+                            if entryData.isdigit(): # pārbauda vai "entryData" mainīgais satur ciparus
+                                errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                                return False # atgriež False
+                if optionOption == "Personas Kods": # ja "optionOption" ir "Personas Kods"
+                    if len(entryData) < 12: # pārbauda vai "entryData" mainīgā vērtības garums ir mazāks par 12
+                        errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                        return False # atgriež False
+                    if not entryData[:6].isdigit() or not entryData[7:].isdigit() or entryData[6] != "-": # pārbauda vai "entryData" mainīgā vērtība līdz 7. simbolam nav cipars vai vērtība no 8. simbola nav cipars, vai 7. simbols nav "-"
+                        errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                        return False # atgriež False
+                if optionOption == "Bruto Alga" or optionOption == "Bērnu Skaits" or optionOption == "Neto Alga": # pārbauda vai mainīgā "optionOption" ir "Bruto Alga" vai "BĒrnu Skaits", vai "Neto Alga"
+                    if not entryData.isdigit(): # pārbauda vai "entryData" mainīgais NEsatur ciparus
+                        errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+                        return False # atgriež False
                     
                 valIdx = {"darbinieks":{"Vārds":1,"Uzvārds":2,"Personas Kods":3,"Bērnu Skaits":4,"Bruto Alga":5},"darba_devejs":{"Vārds":1,"Uzvārds":2},"alga":{"Uzņēmums":1,"Neto Alga":2}}
                 
                 if entryData == data[valIdx[option][optionOption]]:
-                    errorFrame("Ievadiet JAUNUS datus!")
+                    errorFrame("Ievadiet JAUNUS datus!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                     return False
                 
                 if option == "darbinieks" or "darba_devejs":
                     if optionOption == "Vārds":
                         for i in dbDati[option]:
                             if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Uzvārds"]] == i[valIdx[option]["Uzvārds"]]:
-                                errorFrame("Šādi dati jau iekļauti datu bāzē!")
+                                errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                                 return False
                     elif optionOption == "Uzvārds":
                         for i in dbDati[option]:
                             if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Vārds"]] == i[valIdx[option]["Vārds"]]:
-                                errorFrame("Šādi dati jau iekļauti datu bāzē!")
+                                errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                                 return False
                             
                 if optionOption == "Personas Kods" or "Uzņēmums":
                     for i in dbDati[option]:
                         if entryData == i[valIdx[option][optionOption]]:
-                            errorFrame("Šādi dati jau iekļauti datu bāzē!")
+                            errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                             return False
 
                 tableNames = {"darbinieks":{"Vārds":"darbinieks_vards","Uzvārds":"darbinieks_uzvards","Personas Kods":"darbinieks_pk","Bērnu Skaits":"darbinieks_berni","Bruto Alga":"darbinieks_alga"},"darba_devejs":{"Vārds":"darba_devejs_vards","Uzvārds":"darba_devejs_uzvards"},"alga":{"Uzņēmums":"uznemums","Neto Alga":"neto_alga"}}
@@ -479,27 +478,27 @@ def mainApp(): # definē funkciju "mainApp"
             data = {"Vārds/Uzvārds":nameEntry.get(),"Personas Kods":pkEntry.get(),"Bruto alga":brutoEntry.get(),"Bērnu skaits":childEntry.get(),"Darba devējs":ddEntry.get(),"Uzņēmums":companyEntry.get()}
             for i in data:
                 if data[i]=='':
-                    errorFrame(f"{i} lauciņš palika tukšs!")
+                    errorFrame(f"{i} lauciņš palika tukšs!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                     return False
                 if i == "Vārds/Uzvārds" or i == "Darba devējs" or i == "Uzņēmums":
                     if data[i].isdigit():
-                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                         return False
                     if i == "Vārds/Uzvārds" or i == "Darba devējs":
                         if len(data[i].split(" ")) != 2:
                             print(len(data[i].split(" ")))
-                            errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                            errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                             return False
                 if i == "Personas Kods":
                     if len(data[i]) < 12:
-                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                         return False
                     if not data[i][:6].isdigit() or not data[i][7:].isdigit() or data[i][6] != "-":
-                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                         return False
                 if i == "Bruto alga" or i == "Bērnu skaits":
                     if not data[i].isdigit():
-                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!")
+                        errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                         return False
             outputFrame(data)
 
