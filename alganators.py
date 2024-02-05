@@ -334,226 +334,225 @@ def mainApp(): # definē funkciju "mainApp"
                         errorFrame(f"lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
                         return False # atgriež False
                     
-                valIdx = {"darbinieks":{"Vārds":1,"Uzvārds":2,"Personas Kods":3,"Bērnu Skaits":4,"Bruto Alga":5},"darba_devejs":{"Vārds":1,"Uzvārds":2},"alga":{"Uzņēmums":1,"Neto Alga":2}}
+                valIdx = {"darbinieks":{"Vārds":1,"Uzvārds":2,"Personas Kods":3,"Bērnu Skaits":4,"Bruto Alga":5},"darba_devejs":{"Vārds":1,"Uzvārds":2},"alga":{"Uzņēmums":1,"Neto Alga":2}} # indeksu numerācija katrā no strukturētiem datu sarakstiem
                 
-                if entryData == data[valIdx[option][optionOption]]:
+                if entryData == data[valIdx[option][optionOption]]: # pārbaude vai "entryData" mainīgā vērtība atbilst saraksta "data" elementam pie specifiskā elementa indeksa, kuru nosaka no "valIdx" vārdnīca
                     errorFrame("Ievadiet JAUNUS datus!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                    return False
+                    return False # atgriež False
                 
-                if option == "darbinieks" or "darba_devejs":
-                    if optionOption == "Vārds":
-                        for i in dbDati[option]:
-                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Uzvārds"]] == i[valIdx[option]["Uzvārds"]]:
+                if option == "darbinieks" or "darba_devejs": # ja mainīgā "option" vērtība ir "darbinieks" vai "darba_devejs"
+                    if optionOption == "Vārds": # ja mainīgā "optionOption" vērtība ir "Vārds"
+                        for i in dbDati[option]: # iterācija cauri "dbDati" vārdnīcai pie atslēgas "option"
+                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Uzvārds"]] == i[valIdx[option]["Uzvārds"]]: # pārbaude vai "entryData" mainīgā vērtība atbilst tekošās iterācijas vērtības elementam pie konkrēta indeksa un, vai "data" vārdnīcas elements "Uzvārds" pie konkrētas atslēgas sakrīt ar tekošās iterācijas vērtības elementu pie konkrēta indeksa 
                                 errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                                return False
-                    elif optionOption == "Uzvārds":
-                        for i in dbDati[option]:
-                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Vārds"]] == i[valIdx[option]["Vārds"]]:
+                                return False # atgriež False
+                    elif optionOption == "Uzvārds": # citādi ja "optionOption" vērtība ir "Uzvārds"
+                        for i in dbDati[option]: # iterācija cauri "dbDati" vārdnīcai pie atslēgas "option"
+                            if entryData == i[valIdx[option][optionOption]] and data[valIdx[option]["Vārds"]] == i[valIdx[option]["Vārds"]]: # pārbaude vai "entryData" mainīgā vērtība atbilst tekošās iterācijas vērtības elementam pie konkrēta indeksa un, vai "data" vārdnīcas elements "Vārds" pie konkrētas atslēgas sakrīt ar tekošās iterācijas vērtības elementu pie konkrēta indeksa 
                                 errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                                return False
+                                return False # atgriež False
                             
-                if optionOption == "Personas Kods" or "Uzņēmums":
-                    for i in dbDati[option]:
-                        if entryData == i[valIdx[option][optionOption]]:
+                if optionOption == "Personas Kods" or "Uzņēmums": # ja "optionOption" vērtība ir "Uzņēmums" vai "Personas Kods"
+                    for i in dbDati[option]: # iterācija cauri "dbDati" vārdnīcai pie atslēgas "option"
+                        if entryData == i[valIdx[option][optionOption]]: # pārbaude vai "entryData" mainīgā vērtība atbilst tekošās iterācijas vērtības elementam pie konkrēta indeksa
                             errorFrame("Šādi dati jau iekļauti datu bāzē!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                            return False
+                            return False # atgriež False
 
-                tableNames = {"darbinieks":{"Vārds":"darbinieks_vards","Uzvārds":"darbinieks_uzvards","Personas Kods":"darbinieks_pk","Bērnu Skaits":"darbinieks_berni","Bruto Alga":"darbinieks_alga"},"darba_devejs":{"Vārds":"darba_devejs_vards","Uzvārds":"darba_devejs_uzvards"},"alga":{"Uzņēmums":"uznemums","Neto Alga":"neto_alga"}}
-                sqlQuery = ("UPDATE %s SET %s = '%s' WHERE ID_%s ='%s' " % (option,tableNames[option][optionOption],entryData,option,data[0]))
-                Alganators(0,0,0,0,0,0,0,0).editDb(sqlQuery)
+                tableNames = {"darbinieks":{"Vārds":"darbinieks_vards","Uzvārds":"darbinieks_uzvards","Personas Kods":"darbinieks_pk","Bērnu Skaits":"darbinieks_berni","Bruto Alga":"darbinieks_alga"},"darba_devejs":{"Vārds":"darba_devejs_vards","Uzvārds":"darba_devejs_uzvards"},"alga":{"Uzņēmums":"uznemums","Neto Alga":"neto_alga"}} # vārdnīcas izveide ar tabulu nosaukumiem un tabulu kolonnu nosaukumiem, vieglai piekļuvei
+                sqlQuery = ("UPDATE %s SET %s = '%s' WHERE ID_%s ='%s' " % (option,tableNames[option][optionOption],entryData,option,data[0])) # sql pieprasījuma izveide ar konkrētiem datiem
+                Alganators(0,0,0,0,0,0,0,0).editDb(sqlQuery) # klases "Alganators" "editDb" metodes izsaukšana ar parametru "sqlQuery"
 
-    def stepsFrame(data,obj_alga):
-        frame = customtkinter.CTkToplevel(master=root)
-        frame.geometry("700x400")
-        frame.resizable(False,False)
-        frame.title("Algas aprēķina programma")
-        frame.attributes('-topmost', 'true')
+    def stepsFrame(data,obj_alga): # "stepsFrame" funkcijas definēšana ar parametriem "data", "obj_alga"
+        frame = customtkinter.CTkToplevel(master=root) # iznirstošā rāmja izveide galvenajā logā
+        frame.geometry("700x400") # rāmja izmēra maiņa
+        frame.resizable(False,False) # rāmja izmēru lietotājs mainīt nevarēs
+        frame.title("Algas aprēķina programma") # rāmja nosaukuma maiņa
+        frame.attributes('-topmost', 'true') # rāmja izvietošana pa priekšu citiem logiem
 
-        innerFrame = customtkinter.CTkFrame(master=frame)
-        innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
+        innerFrame = customtkinter.CTkFrame(master=frame) # iekšējā rāmja izveide
+        innerFrame.pack(pady=10, padx=20, fill="both", expand=True) # iekšējā rāmja izvietošana un konfigurēšana
 
-        label = customtkinter.CTkLabel(master=innerFrame, text="Aprēķina soļi", font=("Roboto",22))
-        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
+        label = customtkinter.CTkLabel(master=innerFrame, text="Aprēķina soļi", font=("Roboto",22)) # teksta elementa izveide
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew") # teksta elementa izvietošana režģa veidā
 
-        if int(data["Bruto alga"]) < 1667:
-            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}")
-            iin_baze = (int(data['Bruto alga']) - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
-            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}")
-            if iin_baze > 0:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}")
-            else:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
-                iin_baze = 0
-            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze * 20% = {iin_baze * 0.2}")
-            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Neto alga]: Bruto alga - SN - IIN = {obj_alga}")
-            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
-            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0)
-            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0)
-            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0)
-            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
-        else:
-            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}")
-            iin_baze = (1667 - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250))
-            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}")
-            if iin_baze > 0:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}")
-            else:
-                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0")
-                iin_baze = 0
-            parpalikums = int(data['Bruto alga']) - 1667
-            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze - 10.5% = {iin_baze * 0.105}")
-            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Pārpalikums]: Bruto alga - 1667 = {parpalikums}")
-            step6 = customtkinter.CTkLabel (master=innerFrame, text=f"6. Solis [IIN 2]: Pārpalikums * 23% = {parpalikums * 0.23}")
-            step7 = customtkinter.CTkLabel (master=innerFrame, text=f"7. Solis [Neto alga]: Bruto alga - SN - IIN - IIN 2 = {obj_alga}")
-            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
-            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0)
-            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0)
-            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0)
-            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0)
-            step6.grid(pady=5,padx=10,sticky="nsew",row=6,column=0)
-            step7.grid(pady=5,padx=10,sticky="nsew",row=7,column=0)
+        if int(data["Bruto alga"]) < 1667: # pārbauda vai skaitlis no "data" vārdnīcas pie atslēgas "Bruto alga" ir mazāks par 1667
+            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}") # teksta elementa izveide
+            iin_baze = (int(data['Bruto alga']) - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250)) # mainīgā iin_baze izveide, kas aprēķina iin bāzi pēc klasē "Alganators" dotās formulas
+            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}") # teksta elementa izveide
+            if iin_baze > 0: # pārbaude vai iin_baze mainīgā vērtība ir lielāka par 0
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}") # teksta elementa izveide
+            else: # ja iin_baze mainīgā vērtība ir mazāka par 0
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: Bruto alga - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0") # teksta elementa izveide
+                iin_baze = 0 # iin_baze mainīgo pielīdzina 0
+            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze * 20% = {iin_baze * 0.2}") # teksta elementa izveide
+            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Neto alga]: Bruto alga - SN - IIN = {obj_alga}") # teksta elementa izveide
+            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0) # teksta elementa izvietošana logā 1. rindā
+            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0) # teksta elementa izvietošana logā 2. rindā
+            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0) # teksta elementa izvietošana logā 3. rindā
+            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0) # teksta elementa izvietošana logā 4. rindā
+            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0) # teksta elementa izvietošana logā 5. rindā
+        else: # citādi, ja skaitlis no "data" vārdnīcas pie atslēgas "Bruto alga" ir lielāks par 1667
+            step1 = customtkinter.CTkLabel (master=innerFrame, text=f"1. Solis [SN]: Bruto alga * 10.5% = {int(data['Bruto alga']) * 0.105}") # teksta elementa izveide
+            iin_baze = (1667 - (int(data['Bruto alga']) * 0.105) - (int(data['Bērnu skaits'])*250)) # mainīgā iin_baze izveide, kas aprēķina iin bāzi pēc klasē "Alganators" dotās formulas
+            step2 = customtkinter.CTkLabel (master=innerFrame, text=f"2. Solis [Atvieglojums]: Bērnu skaits * 250 = {(int(data['Bērnu skaits'])*250)}") # teksta elementa izveide
+            if iin_baze > 0: # pārbaude vai iin_baze mainīgā vērtība ir lielāka par 0
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}") # teksta elementa izveide
+            else: # citādi
+                step3 = customtkinter.CTkLabel (master=innerFrame, text=f"3. Solis [IIN bāze]: 1667 - SN - Atvieglojums = {iin_baze}, jeb IIN bāze = 0") # teksta elementa izveide
+                iin_baze = 0 # iin_baze mainīgā vērtība pielīdzināta 0
+            parpalikums = int(data['Bruto alga']) - 1667 # pārpalikuma aprēķins pēc formulas no "Alganators" klases aprēķina metodes
+            step4 = customtkinter.CTkLabel (master=innerFrame, text=f"4. Solis [IIN]: IIN bāze - 10.5% = {iin_baze * 0.105}") # teksta elementa izveide
+            step5 = customtkinter.CTkLabel (master=innerFrame, text=f"5. Solis [Pārpalikums]: Bruto alga - 1667 = {parpalikums}") # teksta elementa izveide
+            step6 = customtkinter.CTkLabel (master=innerFrame, text=f"6. Solis [IIN 2]: Pārpalikums * 23% = {parpalikums * 0.23}") # teksta elementa izveide
+            step7 = customtkinter.CTkLabel (master=innerFrame, text=f"7. Solis [Neto alga]: Bruto alga - SN - IIN - IIN 2 = {obj_alga}") # teksta elementa izveide
+            step1.grid(pady=5,padx=10,sticky="nsew",row=1,column=0) # teksta elementa izvietošana logā 1. rindā
+            step2.grid(pady=5,padx=10,sticky="nsew",row=2,column=0) # teksta elementa izvietošana logā 2. rindā
+            step3.grid(pady=5,padx=10,sticky="nsew",row=3,column=0) # teksta elementa izvietošana logā 3. rindā
+            step4.grid(pady=5,padx=10,sticky="nsew",row=4,column=0) # teksta elementa izvietošana logā 4. rindā
+            step5.grid(pady=5,padx=10,sticky="nsew",row=5,column=0) # teksta elementa izvietošana logā 5. rindā
+            step6.grid(pady=5,padx=10,sticky="nsew",row=6,column=0) # teksta elementa izvietošana logā 6. rindā
+            step7.grid(pady=5,padx=10,sticky="nsew",row=7,column=0) # teksta elementa izvietošana logā 7. rindā
 
 
-        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
-        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
+        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150) # teksta gabala izveide
+        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew") # teksta elementa izvietošana logā 3. rindā 1. kolonnā
 
-        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024")
-        author.pack()
+        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024") # autortiesības teksta elements
+        author.pack() # autortiesību teksta elementa iepakošana
 
-    def savingGUI(bool):
-        if bool:
-            print("saved")
-        else:
-            print("fail")
+    def savingGUI(bool): # funkcijas "savingGUI" definēšana ar parametru "bool"
+        if bool: # ja "bool" parametrs ir patiess
+            print("saved") # izvada tekstu "saved"
+        else: # ja "bool" parametrs NAV patiess
+            print("fail") # izvada tekstu "fail"
 
-    def outputFrame(data):
-        frame = customtkinter.CTkToplevel(master=root)
-        frame.geometry("700x350")
-        frame.resizable(False,False)
-        frame.title("Algas aprēķina programma")
-        frame.attributes('-topmost', 'true')
+    def outputFrame(data): # definē funkciju "outputFrame" ar parametru data
+        frame = customtkinter.CTkToplevel(master=root) # iznirstošā rāmja izveide galvenajā logā
+        frame.geometry("700x350") # rāmja izmēra maiņa
+        frame.resizable(False,False) # rāmja izmēru lietotājs mainīt nevarēs
+        frame.title("Algas aprēķina programma") # rāmja nosaukuma maiņa
+        frame.attributes('-topmost', 'true') # rāmja izvietošana pa priekšu citiem logiem
         
-        name=data["Vārds/Uzvārds"].split(" ")
-        ddName=data["Darba devējs"].split(" ")
+        name=data["Vārds/Uzvārds"].split(" ") # izveido mainīgo name un piešķir tam sadalīto "data" vārdnīcas vērtību pie atslēgas "Vārds/Uzvārds"
+        ddName=data["Darba devējs"].split(" ") # izveido mainīgo ddName un piešķir tam sadalīto "data" vārdnīcas vērtību pie atslēgas "Darba devējs"
 
-        obj = Alganators(data["Bruto alga"],data["Bērnu skaits"],name[0],name[1],data["Personas Kods"],data["Uzņēmums"],ddName[0],ddName[1])
-        obj_alga = obj.algas_formula()
+        obj = Alganators(data["Bruto alga"],data["Bērnu skaits"],name[0],name[1],data["Personas Kods"],data["Uzņēmums"],ddName[0],ddName[1]) # objekta izveide klasei "Alganators"
+        obj_alga = obj.algas_formula() # tikko izveidotajam objektam izsauc metodi "algas_formula" un tās vērtību piešķir mainīgajam "obj_alga"
 
-        innerFrame = customtkinter.CTkFrame(master=frame)
-        innerFrame.pack(pady=10, padx=20, fill="both", expand=True)
+        innerFrame = customtkinter.CTkFrame(master=frame) # izveido iekšējo lodziņu
+        innerFrame.pack(pady=10, padx=20, fill="both", expand=True) # izvieto iekšējo lodziņu
 
-        label = customtkinter.CTkLabel(master=innerFrame, text="Algas aprēķina programma", font=("Roboto",22))
-        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
+        label = customtkinter.CTkLabel(master=innerFrame, text="Algas aprēķina programma", font=("Roboto",22)) # izveido teksta elementu
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew") # izvieto teksta elementu
 
-        nameLabel = customtkinter.CTkLabel (master=innerFrame, text=f"Vārds/Uzvārds: {data['Vārds/Uzvārds']}")
-        pkLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Personas Kods: {data['Personas Kods']}")
-        brutoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bruto Alga: {data['Bruto alga']}")
-        childLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bērnu Skaits: {data['Bērnu skaits']}")
-        ddLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Darba Devējs (Vārds/Uzvārds): {data['Darba devējs']}")
-        companyLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Uzņēmums: {data['Uzņēmums']}")
+        nameLabel = customtkinter.CTkLabel (master=innerFrame, text=f"Vārds/Uzvārds: {data['Vārds/Uzvārds']}") #izveido teksta elementu vārdam
+        pkLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Personas Kods: {data['Personas Kods']}") #izveido teksta elementu personas kodam
+        brutoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bruto Alga: {data['Bruto alga']}") #izveido teksta elementu bruto algai
+        childLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Bērnu Skaits: {data['Bērnu skaits']}") #izveido teksta elementu bērnu skaitam
+        ddLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Darba Devējs (Vārds/Uzvārds): {data['Darba devējs']}") #izveido teksta elementu darba devējam
+        companyLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Uzņēmums: {data['Uzņēmums']}") #izveido teksta elementu uzņēmumam
             
-        nameLabel.grid(pady=5,padx=10,sticky="nsew",row=1,column=0)
-        pkLabel.grid(pady=5,padx=10,sticky="nsew",row=2)
-        brutoLabel.grid(pady=5,padx=10,sticky="nsew",row=3)
-        childLabel.grid(pady=5,padx=10,sticky="nsew",row=4)
-        ddLabel.grid(pady=5,padx=10,sticky="nsew",row=5)
-        companyLabel.grid(pady=5,padx=10,sticky="nsew",row=6)
+        nameLabel.grid(pady=5,padx=10,sticky="nsew",row=1,column=0) #teksta elementa izviedošana režģī, 1. rindā
+        pkLabel.grid(pady=5,padx=10,sticky="nsew",row=2) #teksta elementa izviedošana režģī, 2. rindā
+        brutoLabel.grid(pady=5,padx=10,sticky="nsew",row=3) #teksta elementa izviedošana režģī, 3. rindā
+        childLabel.grid(pady=5,padx=10,sticky="nsew",row=4) #teksta elementa izviedošana režģī, 4. rindā
+        ddLabel.grid(pady=5,padx=10,sticky="nsew",row=5) #teksta elementa izviedošana režģī, 5. rindā
+        companyLabel.grid(pady=5,padx=10,sticky="nsew",row=6) #teksta elementa izviedošana režģī, 6. rindā
 
-        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150)
-        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew")
+        netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150) # teksta elementa izveide
+        netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew") # teksta elementa izvietošana
 
-        calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga))
-        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: savingGUI(obj.saglabasana()))
-        calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1)
-        saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2)
+        calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga)) # aprēķina podziņas izveidošana
+        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: savingGUI(obj.saglabasana())) # saglabāšanas podziņas izveide
+        calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1) # aprēķina podziņas izvietošana
+        saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2) # saglabāšanas podziņas izvietošana
 
-        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024")
-        author.pack()
+        author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024") # teksta elementa izveide
+        author.pack() # teksta elementa izvietošana
 
-    def inputFrame():
-        frame = customtkinter.CTkFrame(master=root)
-        frame.pack(pady=10, padx=20, fill="both", expand=True)
+    def inputFrame(): # "inputFrame" funkcijas definēšana
+        frame = customtkinter.CTkFrame(master=root) # lodziņa izveide
+        frame.pack(pady=10, padx=20, fill="both", expand=True) # lodziņa izvietošana
 
-        def check():
-            data = {"Vārds/Uzvārds":nameEntry.get(),"Personas Kods":pkEntry.get(),"Bruto alga":brutoEntry.get(),"Bērnu skaits":childEntry.get(),"Darba devējs":ddEntry.get(),"Uzņēmums":companyEntry.get()}
-            for i in data:
-                if data[i]=='':
+        def check(): # funkcijas "check" definēšana
+            data = {"Vārds/Uzvārds":nameEntry.get(),"Personas Kods":pkEntry.get(),"Bruto alga":brutoEntry.get(),"Bērnu skaits":childEntry.get(),"Darba devējs":ddEntry.get(),"Uzņēmums":companyEntry.get()} # mainīgā "data" izveidošana, kas ir vārdnīca ar visiem lietotāja ievadītiem datiem iekšā
+            for i in data: # iterācija cauri "data" vārdnīcas atslēgām
+                if data[i]=='': # ja vērtība pie "i" atslēgas vārdnīcā "data" ir tukša
                     errorFrame(f"{i} lauciņš palika tukšs!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                    return False
-                if i == "Vārds/Uzvārds" or i == "Darba devējs" or i == "Uzņēmums":
-                    if data[i].isdigit():
+                    return False # atgriež False
+                if i == "Vārds/Uzvārds" or i == "Darba devējs" or i == "Uzņēmums": # pārbaude vai atslēga ir "Vārds/Uzvārds" vai "Darba devējs", vai "Uzņēmums"
+                    if data[i].isdigit(): # pārbaude vai "data" vērtība pie atslēgas "i" ir skaitlis
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                        return False
-                    if i == "Vārds/Uzvārds" or i == "Darba devējs":
-                        if len(data[i].split(" ")) != 2:
-                            print(len(data[i].split(" ")))
+                        return False # atgriež False
+                    if i == "Vārds/Uzvārds" or i == "Darba devējs": # pārbaude vai atslēga ir "Vārds/Uzvārds" vai "Darba devējs", vai "Uzņēmums"
+                        if len(data[i].split(" ")) != 2: # pārbauda vai sadalītas vārdnīcas "data" pie atslēgas "i" vērtības, jeb saraksta garums nav 2
                             errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                            return False
-                if i == "Personas Kods":
-                    if len(data[i]) < 12:
+                            return False # atgriež False
+                if i == "Personas Kods": # pārbaude vai atslēga ir "Vārds/Uzvārds" vai "Darba devējs", vai "Uzņēmums"
+                    if len(data[i]) < 12: # pārbauda vai vārdnīcas "data" pie atslēgas "i" vērtības garums ir mazāks par 12
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                        return False
-                    if not data[i][:6].isdigit() or not data[i][7:].isdigit() or data[i][6] != "-":
+                        return False # atgriež False
+                    if not data[i][:6].isdigit() or not data[i][7:].isdigit() or data[i][6] != "-": # pārbauda vai vārdnīcas "data" vērtība pie atslēgas "i" nav cipars līdz 7. simbolam vai no 8. simbola, vai vārdnīcas "data" vērtība pie atslēgas "i" tieši 6 simbola vietā nav "-"
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                        return False
-                if i == "Bruto alga" or i == "Bērnu skaits":
-                    if not data[i].isdigit():
+                        return False # atgriež False
+                if i == "Bruto alga" or i == "Bērnu skaits": # pārbaude vai atslēga ir "Bruto alga" vai "Bērnu skaits"
+                    if not data[i].isdigit(): # pārbaude vai "data" vērtība pie atslēgas "i" nav skaitlis
                         errorFrame(f"{i} lauciņš netika aizpildīts korekti!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
-                        return False
-            outputFrame(data)
+                        return False # atgriež False
+            outputFrame(data) # izsauc funkciju "outputFrame" ar parametru "data", jo tas izgāja pārbaudi
 
 
-        label = customtkinter.CTkLabel(master=frame, text="Algas aprēķina programma", font=("Roboto",22))
-        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew")
-        nameEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Vārds/Uzvārds")
-        pkEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Personas Kods")
-        brutoEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bruto Alga")
-        childEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bērnu Skaits")
-        ddEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Darba Devējs (Vārds/Uzvārds)")
-        companyEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Uzņēmums")
-        aprekinatButton = customtkinter.CTkButton(master=frame, text="Aprēķināt", command=check)
+        label = customtkinter.CTkLabel(master=frame, text="Algas aprēķina programma", font=("Roboto",22)) # teksta elementa izveide (tituls, galvenais teksts)
+        label.grid(row=0, column=0, padx=20, pady=10,sticky="nsew") # teksta elementa izvietošana režģī
+        nameEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Vārds/Uzvārds") # ievades elementa izveide
+        pkEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Personas Kods") # ievades elementa izveide
+        brutoEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bruto Alga") # ievades elementa izveide
+        childEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Bērnu Skaits") # ievades elementa izveide
+        ddEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Darba Devējs (Vārds/Uzvārds)") # ievades elementa izveide
+        companyEntry = customtkinter.CTkEntry(master=frame, placeholder_text="Uzņēmums") # ievades elementa izveide
+        aprekinatButton = customtkinter.CTkButton(master=frame, text="Aprēķināt", command=check) # pogas elementa izveide
 
-        nameEntry.grid(pady=5,padx=10,sticky="nsew",row=1)
-        pkEntry.grid(pady=5,padx=10,sticky="nsew",row=2)
-        brutoEntry.grid(pady=5,padx=10,sticky="nsew",row=3)
-        childEntry.grid(pady=5,padx=10,sticky="nsew",row=4)
-        ddEntry.grid(pady=5,padx=10,sticky="nsew",row=5)
-        companyEntry.grid(pady=5,padx=10,sticky="nsew",row=6)
-        aprekinatButton.grid(pady=5,padx=5,row=6,column=1)
+        nameEntry.grid(pady=5,padx=10,sticky="nsew",row=1) # ievades elementa izvietošana režģī 1. rindā
+        pkEntry.grid(pady=5,padx=10,sticky="nsew",row=2) # ievades elementa izvietošana režģī 2. rindā
+        brutoEntry.grid(pady=5,padx=10,sticky="nsew",row=3) # ievades elementa izvietošana režģī 3. rindā
+        childEntry.grid(pady=5,padx=10,sticky="nsew",row=4) # ievades elementa izvietošana režģī 4. rindā
+        ddEntry.grid(pady=5,padx=10,sticky="nsew",row=5) # ievades elementa izvietošana režģī 5. rindā
+        companyEntry.grid(pady=5,padx=10,sticky="nsew",row=6) # ievades elementa izvietošana režģī 6. rindā
+        aprekinatButton.grid(pady=5,padx=5,row=6,column=1) # pogas elementa izvietošana režģī 6. rindas 1. kolonnā
 
-        author = customtkinter.CTkLabel(master=root,text="© Aleksis Počs 2024")
-        author.pack()
+        author = customtkinter.CTkLabel(master=root,text="© Aleksis Počs 2024") # programmas autora teksta elementa izveide
+        author.pack() # programmas autora teksta elementa izvietošana
 
-    def loginFrame():   
-        def login():
-            credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()}
-            if credentials["Login_Input"] != "Admin" or not totp.verify(credentials["Password_Input"]):
-                errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!")
-            elif credentials["Login_Input"] == "Admin" or totp.verify(credentials["Password_Input"]):
-                loginframe.destroy()
-                editFrame(Alganators(0,0,0,0,0,0,0,0).db_dati_return())
+    def loginFrame(): # "loginFrame" funkcijas izveide
+        def login(): # "login" funkcijas izveide
+            credentials = {"Login_Input":loginEntry.get(),"Password_Input":passwordEntry.get()} # pieejas datu vārdnīcas izveide, vieglai piekļuvei
+            if credentials["Login_Input"] != "Admin" or not totp.verify(credentials["Password_Input"]): # pārbaude vai dati no vārdnīcas "credentials" nav pareizi ievadīti, nav pārbaudīti (verify)
+                errorFrame("Lietotājvārds vai parole tika ievadīta nepareizi!") # izsauc funkciju "errorFrame" ar sekojošu tekstu
+            elif credentials["Login_Input"] == "Admin" or totp.verify(credentials["Password_Input"]): # citādi, ja visi dati tika ievadīti pareizi
+                loginframe.destroy() # iznīcināt "loginframe" rāmi/logu
+                editFrame(Alganators(0,0,0,0,0,0,0,0).db_dati_return()) # izsauc "editFrame" funkciju, jeb datu piekļuves/rediģēšanas režīma uzsākšana
 
-        def guest():
-            loginframe.destroy()
-            inputFrame()
+        def guest(): # funkcija "guest" izveide
+            loginframe.destroy() # "loginframe" loga iznīcināšana
+            inputFrame() # ievades loga/rāmja izsaukšana
             
-        loginframe = customtkinter.CTkFrame(master=root)
-        loginframe.pack(pady=20, padx=60, fill="both", expand=True)
+        loginframe = customtkinter.CTkFrame(master=root) # rāmja izveide
+        loginframe.pack(pady=20, padx=60, fill="both", expand=True) # rāmja izvietošana logā
 
-        label = customtkinter.CTkLabel(master=loginframe, text="Sveicināti, Lietotāj!", font=("Roboto",22))
-        label.pack(pady=12,padx=10)
+        label = customtkinter.CTkLabel(master=loginframe, text="Sveicināti, Lietotāj!", font=("Roboto",22)) # teksta elementa izveide, virsraksts
+        label.pack(pady=12,padx=10) # teksta elementa, virsraksta izvietošana
 
-        loginEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Lietotājvārds")
-        loginEntry.pack(pady=12,padx=10)
+        loginEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Lietotājvārds") # lietotājvārda ievades izveide
+        loginEntry.pack(pady=12,padx=10)  # lietotājvārda ievades izvietošana rāmī
 
-        passwordEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Key", show="*")
-        passwordEntry.pack(pady=12,padx=10)
+        passwordEntry = customtkinter.CTkEntry(master=loginframe, placeholder_text="Key", show="*") # paroles ievades izveide
+        passwordEntry.pack(pady=12,padx=10) # paroles ievades izvietošana rāmī
 
-        loginbutton = customtkinter.CTkButton(master=loginframe, text="Pieslēgties", command=login)
-        loginbutton.pack(pady=12,padx=10)
+        loginbutton = customtkinter.CTkButton(master=loginframe, text="Pieslēgties", command=login) # administratora ieejas pogas izveide
+        loginbutton.pack(pady=12,padx=10) # administratora ieejas pogas izvietošana rāmī
 
-        guestButton = customtkinter.CTkButton(master=loginframe, text="Viesa režīms", command=guest)
-        guestButton.pack(pady=12,padx=10)
+        guestButton = customtkinter.CTkButton(master=loginframe, text="Viesa režīms", command=guest) # viesa pogas izveide
+        guestButton.pack(pady=12,padx=10) # viesa pogas izvietošana rāmī
 
     loginFrame() # izsauc funkciju "loginFrame"
 
