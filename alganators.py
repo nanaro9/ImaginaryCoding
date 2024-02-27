@@ -150,14 +150,14 @@ class Alganators(): # Definē klasi Alganators
         structures = self.pieskir_index(structures,indeksi) # pielīdzina structures mainīgā vērtību - metodes "pieskir_index" atgrieztajiem datiem
         parbaude = self.datu_parbaude(structures) # izveido mainīgo "parbaude", lai pārbaudīt "structures" sarakstā esošo sarakstu datu unikalitāti
         if not parbaude: # pārbaudes laikā netika atrasti dati, kas atkārtojas
-            if os.path.isfile(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt"): # pārbauda vai šajā ceļā atrodas sekojošais fails
+            if os.path.isfile(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt"): # pārbauda vai šajā ceļā atrodas sekojošais fails
                 savingData = f"\n-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8") # atver failu sekojošajā ceļā pievienošanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f = open(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8") # atver failu sekojošajā ceļā pievienošanas režīmā (ja tāda nav, viņš to vienkārši izveido)
                 f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
                 f.close() # pēc darba aizver failu
             else: # ja šajā ceļā NEatrodas šāds fails
                 savingData = f"-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
-                f = open(f"./alganators_save/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8") # atver failu sekojošajā ceļā rakstīšanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f = open(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8") # atver failu sekojošajā ceļā rakstīšanas režīmā (ja tāda nav, viņš to vienkārši izveido)
                 f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
                 f.close() # pēc darba aizver failu
             count=0 # mainīgais, lai sekot līdzi iterāciju skaitam
@@ -281,9 +281,10 @@ def mainApp(): # definē funkciju "mainApp"
 
             idx = 0 # mainīgā "idx" definēšana iterāciju skaita sekošana
             for v in EditData[1][1:]: # iterācija cauri "EditData" sarakstam
-                dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[EditData[0]][idx]}: {str(v)}", font=("Roboto",18)) # teksta elementa izveide, kam piešķir vēlamo rediģējamo datu nosaukumus un to vērtības
-                dataLabel.pack(pady=12) # izvieto datus uz ekrāna
-                idx+=1 # palielina "idx" mainīgā vērtību par vienu
+                if idx < len(optionList[EditData[0]]):
+                    dataLabel = customtkinter.CTkLabel(master=innerFrame, text=f"{optionList[EditData[0]][idx]}: {str(v)}", font=("Roboto",18)) # teksta elementa izveide, kam piešķir vēlamo rediģējamo datu nosaukumus un to vērtības
+                    dataLabel.pack(pady=12) # izvieto datus uz ekrāna
+                    idx+=1 # palielina "idx" mainīgā vērtību par vienu
 
             optionmenu = customtkinter.CTkOptionMenu(frame, values=optionList[EditData[0]]) # "izvēlnes" izveide
             optionmenu.pack(pady=12) # izvieto "izvēlnes" elementu uz lodziņa
@@ -428,7 +429,7 @@ def mainApp(): # definē funkciju "mainApp"
 
     def outputFrame(data): # definē funkciju "outputFrame" ar parametru data
         frame = customtkinter.CTkToplevel(master=root) # iznirstošā rāmja izveide galvenajā logā
-        frame.geometry("700x350") # rāmja izmēra maiņa
+        frame.geometry("900x350") # rāmja izmēra maiņa
         frame.resizable(False,False) # rāmja izmēru lietotājs mainīt nevarēs
         frame.title("Algas aprēķina programma") # rāmja nosaukuma maiņa
         frame.attributes('-topmost', 'true') # rāmja izvietošana pa priekšu citiem logiem
@@ -462,9 +463,20 @@ def mainApp(): # definē funkciju "mainApp"
         netoLabel = customtkinter.CTkLabel(master=innerFrame, text=f"Neto Alga: {'{:.2f}'.format(obj_alga)}", font=("Roboto",20),justify="center",wraplength=150) # teksta elementa izveide
         netoLabel.grid(row=3, column=1, padx=20, pady=10,sticky="nsew") # teksta elementa izvietošana
 
+        check_var = customtkinter.StringVar(value="off") # lietotāja piekrišanas vērtības izveide
+
+        def userAgreementCheck(val): # funkcijas izveide, kura pārbauda lietotāja piekrišanu nosacījumiem
+            if val == "off": # pārbauda vai vērtība ir "off"
+                errorFrame("Jūs nepiekritāt datu saglabāšanas nosacījumiem!") # izsauc kļūdu, parāda lietotājam, ka viņš nepiekrita nosacījumiem
+            elif val == "on": # ja vērtība ir "on"
+                savingGUI(obj.saglabasana()) # izsauc saglabāšanas funkciju
+
         calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga)) # aprēķina podziņas izveidošana
-        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt .txt",font=("Roboto",14), command=lambda: savingGUI(obj.saglabasana())) # saglabāšanas podziņas izveide
+        saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt datus",font=("Roboto",14), command=lambda: userAgreementCheck(check_var.get())) # saglabāšanas podziņas izveide
+        checkbox = customtkinter.CTkCheckBox(innerFrame, text="Es piekrītu, ka mani dati tiks saglabāti datu bāzē", variable=check_var, onvalue="on", offvalue="off") # lietotāja pierkišanas (user agreement) izveide
+
         calculationBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=1) # aprēķina podziņas izvietošana
+        checkbox.grid(pady=5,padx=10,sticky="nsew",row=5,column=1) # lietotāja piekrišanas izvietošana
         saveBtn.grid(pady=5,padx=10,sticky="nsew",row=6,column=2) # saglabāšanas podziņas izvietošana
 
         author = customtkinter.CTkLabel(master=frame,text="© Aleksis Počs 2024") # teksta elementa izveide
