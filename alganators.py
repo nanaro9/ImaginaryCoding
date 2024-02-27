@@ -6,6 +6,7 @@ import mysql.connector # Tiek nodrošināts savienojums ar bibliotēku "mysql.co
 import customtkinter # Lietotāja ievades bibliotēka, ērta bibliotēka moderna lietotāja interfeisa izveidei
 import pyotp # "Python one-time password" bibliotēka, jeb bibliotēka pagaidu paroļu izveidei
 import qrcode # Šī bibliotēka tika izmantota vienu reizi, lai izveidot qr kodu, ar kura palīdzību varēja savienot pyotp ar mobilo autentifikatoru, jeb laika paroļu ģeneratoru
+import userpaths # Bibliotēka, ar kuras palīdzību ir iespējams atrast ceļu uz konkrētu mapi jebkuram lietotājam
 
 key = 'XGT2BDNVJBTU2JFQCRAVCQPYNFZI2RVI' # base32 atslēgas izveide pyotp bibliotēkai
 totp = pyotp.TOTP(key) # totp izveide, jeb "Pagaidu" paroles izveide, kura balstāz uz laiku. Tā atjaunojas katras 30 sekundes bezgalīgi (Time-Based One Time Password)
@@ -150,14 +151,14 @@ class Alganators(): # Definē klasi Alganators
         structures = self.pieskir_index(structures,indeksi) # pielīdzina structures mainīgā vērtību - metodes "pieskir_index" atgrieztajiem datiem
         parbaude = self.datu_parbaude(structures) # izveido mainīgo "parbaude", lai pārbaudīt "structures" sarakstā esošo sarakstu datu unikalitāti
         if not parbaude: # pārbaudes laikā netika atrasti dati, kas atkārtojas
-            if os.path.isfile(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt"): # pārbauda vai šajā ceļā atrodas sekojošais fails
+            if os.path.isfile(f"{userpaths.get_my_documents()}/alga_{darbinieks_data_structure[3]}.txt"): # pārbauda vai šajā ceļā atrodas sekojošais fails
                 savingData = f"\n-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
-                f = open(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8") # atver failu sekojošajā ceļā pievienošanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f = open(f"{userpaths.get_my_documents()}/alga_{darbinieks_data_structure[3]}.txt", "a",encoding="utf8") # atver failu sekojošajā ceļā pievienošanas režīmā (ja tāda nav, viņš to vienkārši izveido)
                 f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
                 f.close() # pēc darba aizver failu
             else: # ja šajā ceļā NEatrodas šāds fails
                 savingData = f"-Algas aprēķināšanas kopsavilkums-\nVārds/Uzvārds: {darbinieks_data_structure[1]} {darbinieks_data_structure[2]}\nPersonas kods: {darbinieks_data_structure[3]}\nBērnu skaits {darbinieks_data_structure[4]}\nBruto alga: {darbinieks_data_structure[5]}\n\nDarba devējs (Vārds/Uzvārds): {darba_devejs_data_structure[1]} {darba_devejs_data_structure[2]}\nUzņēmums: {alga_data_structure[1]}\n\nNETO ALGA: {alga_data_structure[2]}\n" # izskatīgi sakārto un ievieto datus cilvēkam ērti lasāmā formā
-                f = open(f"C:/Users/Aleks/Documents/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8") # atver failu sekojošajā ceļā rakstīšanas režīmā (ja tāda nav, viņš to vienkārši izveido)
+                f = open(f"{userpaths.get_my_documents()}/alga_{darbinieks_data_structure[3]}.txt", "w",encoding="utf8") # atver failu sekojošajā ceļā rakstīšanas režīmā (ja tāda nav, viņš to vienkārši izveido)
                 f.write(savingData) # ieraksta teksta failā datus no "savingData" mainīgā
                 f.close() # pēc darba aizver failu
             count=0 # mainīgais, lai sekot līdzi iterāciju skaitam
@@ -424,8 +425,10 @@ def mainApp(): # definē funkciju "mainApp"
     def savingGUI(bool): # funkcijas "savingGUI" definēšana ar parametru "bool"
         if bool: # ja "bool" parametrs ir patiess
             print("saved") # izvada tekstu "saved"
+            return bool
         else: # ja "bool" parametrs NAV patiess
             print("fail") # izvada tekstu "fail"
+            return bool
 
     def outputFrame(data): # definē funkciju "outputFrame" ar parametru data
         frame = customtkinter.CTkToplevel(master=root) # iznirstošā rāmja izveide galvenajā logā
@@ -469,7 +472,11 @@ def mainApp(): # definē funkciju "mainApp"
             if val == "off": # pārbauda vai vērtība ir "off"
                 errorFrame("Jūs nepiekritāt datu saglabāšanas nosacījumiem!") # izsauc kļūdu, parāda lietotājam, ka viņš nepiekrita nosacījumiem
             elif val == "on": # ja vērtība ir "on"
-                savingGUI(obj.saglabasana()) # izsauc saglabāšanas funkciju
+                saveStatus = savingGUI(obj.saglabasana()) # piešķir funkcijas atgrieztos datus mainīgajam
+                if saveStatus == True: # izsauc saglabāšanas funkciju un pārbauda vai viss tika saglabāts:
+                    saveBtn.configure(text="Saglabāts!") # nomaina pogas tekstu, paziņojot, ka ir saglabāts
+                elif saveStatus == False: #citādi
+                    saveBtn.configure(text="Dati netika saglabāti!") # nomaina pogas tekstu, paziņojot, ka nav saglabāts
 
         calculationBtn = customtkinter.CTkButton(master=innerFrame,text="Aprēķina Soļi",font=("Roboto",14),command=lambda: stepsFrame(data,obj_alga)) # aprēķina podziņas izveidošana
         saveBtn = customtkinter.CTkButton(master=innerFrame,text="Saglabāt datus",font=("Roboto",14), command=lambda: userAgreementCheck(check_var.get())) # saglabāšanas podziņas izveide
