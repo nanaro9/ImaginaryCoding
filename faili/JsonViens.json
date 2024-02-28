@@ -1,0 +1,21 @@
+{
+    "Vards": "Annnika",
+    "Vecums": 30,
+    "Dzivs": true,
+    "NeDzivs": false,
+    "Berni": [
+        "Gatis",
+        "Anna"
+    ],
+    "Dzivnieki": null,
+    "Masinas": [
+        {
+            "Modelis": "Ford Focus",
+            "Gads": 2007
+        },
+        {
+            "Modelis": "Audi A6",
+            "Gads": 2010
+        }
+    ]
+}
