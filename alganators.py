@@ -295,7 +295,7 @@ def mainApp(): # definē funkciju "mainApp"
 
             def destroyEditFrameContents(): # definē funkciju "destroyEditFrameContents"
                 for f in innerFrame.winfo_children(): # iterācija cauri visiem rediģēšanas lodziņa elementiem
-                    f.destroy() # tekošās iterācijas elementu iznīcina, izposta, izārda un sagrauj 😡
+                    f.destroy() # tekošās iterācijas elementu iznīcina
                 optionmenu.destroy() # iznīcina "izvēlnes" elementu
                 EditBtn.destroy() # iznīcina podziņu
 
